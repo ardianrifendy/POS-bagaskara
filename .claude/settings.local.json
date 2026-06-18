@@ -1,0 +1,9 @@
+{
+  "permissions": {
+    "allow": [
+      "PowerShell(\\(Get-Content \"D:\\\\AntiGravity\\\\BagaskaraCell\\\\www\\\\index.html\" | Measure-Object -Line\\).Lines)",
+      "PowerShell(Get-Process *)",
+      "PowerShell(\\(Get-Content \"D:\\\\AntiGravity\\\\BagaskaraCell\\\\www\\\\index.html\"\\).Count)"
+    ]
+  }
+}
