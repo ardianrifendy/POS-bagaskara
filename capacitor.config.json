@@ -1,0 +1,8 @@
+{
+  "appId": "com.bagaskaracell.invoice",
+  "appName": "Bagaskara Cell Invoice",
+  "webDir": "www",
+  "server": {
+    "androidScheme": "https"
+  }
+}

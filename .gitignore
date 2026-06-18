@@ -1,0 +1,30 @@
+# Dependencies
+node_modules/
+
+# Build outputs
+android/app/build/
+android/.gradle/
+android/build/
+android/capacitor-cordova-android-plugins/build/
+android/capacitor-community-contacts/build/
+
+# APK output (binary, rebuild from source)
+*.apk
+
+# IDE / Editor
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# OS files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Claude / AI config
+.claude/
+
+# Misc
+*.pdf
+scraper/

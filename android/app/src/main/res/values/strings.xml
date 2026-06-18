@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">BagaskaraCell</string>
+    <string name="title_activity_main">BagaskaraCell</string>
+    <string name="package_name">com.bagaskaracell.invoice</string>
+    <string name="custom_url_scheme">com.bagaskaracell.invoice</string>
+</resources>
