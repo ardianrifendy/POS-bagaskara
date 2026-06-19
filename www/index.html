@@ -8,8 +8,8 @@
   <link rel="manifest" href="manifest.json">
   <meta name="theme-color" content="#F7931A">
   
-  <!-- html2pdf.js for client-side PDF generation -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+  <!-- html2pdf.js for client-side PDF generation (LOCAL for offline support) -->
+  <script src="html2pdf.bundle.min.js"></script>
   
   <!-- Tesseract.js for OCR text recognition from camera -->
   <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
@@ -1689,14 +1689,14 @@
     /* PRINT STYLING */
     @media print {
       @page {
-        size: landscape;
-        margin: 0;
+        size: auto;
+        margin: 12mm 15mm;
       }
       body {
-        margin: 1.5cm;
         background: #fff !important;
         color: #000 !important;
-        padding-bottom: 0 !important;
+        padding: 0 !important;
+        margin: 0 !important;
       }
       .topbar, .bottom-nav, .content-container, .preview-header-nav, .action-row, .live-banner, .no-print {
         display: none !important;
@@ -1712,8 +1712,8 @@
       .preview-box {
         box-shadow: none !important;
         border-radius: 0 !important;
-        padding: 0 !important;
-        margin: 0 !important;
+        padding: 10px !important;
+        margin: 0 auto !important;
         max-width: 100% !important;
       }
       .inv-header {
@@ -4746,8 +4746,22 @@
 
       const original = document.getElementById('print-area');
 
-      // Helper untuk menunggu gambar (logo, tanda tangan digital) selesai dimuat sepenuhnya
-      const images = original.querySelectorAll('img');
+      // Clone dan letakkan off-screen dengan position:fixed left:-99999px
+      // PENTING: Gunakan left jauh ke kiri, BUKAN z-index negatif
+      // z-index negatif menyebabkan html2canvas tidak merender → PDF kosong
+      const clone = original.cloneNode(true);
+      clone.style.cssText = `
+        position: fixed;
+        left: -99999px;
+        top: 0;
+        width: ${original.offsetWidth || 600}px;
+        background: #fff;
+        pointer-events: none;
+      `;
+      document.body.appendChild(clone);
+
+      // Tunggu semua gambar (logo, tanda tangan) selesai dimuat
+      const images = clone.querySelectorAll('img');
       const imagePromises = Array.from(images).map(img => {
         if (img.complete) return Promise.resolve();
         return new Promise(resolve => {
@@ -4757,31 +4771,25 @@
       });
 
       Promise.all(imagePromises).then(() => {
-        const widthPx = original.offsetWidth || 600;
-        const heightPx = original.offsetHeight || 800;
-        const pxToMm = 0.264583;
-        const widthMm = widthPx * pxToMm;
-        const heightMm = heightPx * pxToMm;
-        const orientation = widthMm > heightMm ? 'l' : 'p';
-
         const opt = {
-          margin:       0,
+          margin:       [10, 10, 10, 10],
           filename:     fileName,
           image:        { type: 'jpeg', quality: 0.98 },
           html2canvas:  {
-            scale: 2.5,
+            scale: 2,
             useCORS: true,
             allowTaint: true,
             logging: false,
             scrollX: 0,
             scrollY: 0,
             backgroundColor: '#ffffff',
-            windowWidth: widthPx
+            windowWidth: original.offsetWidth || 600
           },
-          jsPDF:        { unit: 'mm', format: [widthMm, heightMm], orientation: orientation }
+          jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
         };
 
-        html2pdf().set(opt).from(original).outputPdf('blob').then(async function(pdfBlob) {
+        html2pdf().set(opt).from(clone).outputPdf('blob').then(async function(pdfBlob) {
+          document.body.removeChild(clone);
           btn.disabled = false;
           btn.innerHTML = originalText;
 
@@ -4831,7 +4839,8 @@
             fallbackWebShare(pdfBlob, fileName, data, store);
           }
         }).catch(err => {
-          console.error(err);
+          if (document.body.contains(clone)) document.body.removeChild(clone);
+          console.error('PDF generation error:', err);
           btn.disabled = false;
           btn.innerHTML = originalText;
           showToast("⚠️ Gagal membuat file PDF!", true);
