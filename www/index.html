@@ -5011,11 +5011,27 @@
     }
 
     // FUNGSI UNTUK CETAK INVOICE (DIPANGGIL DARI PREVIEW)
-    function printInvoiceFromPreview() {
+    async function printInvoiceFromPreview() {
+      const btn = document.querySelector('.btn-print');
+      const originalText = btn.innerHTML;
+      btn.disabled = true;
+      btn.innerHTML = `<span>⏳ Menyiapkan Cetak...</span>`;
+
+      // Minta izin storage terlebih dahulu agar Android Print Spooler memiliki akses tulis
+      if (typeof CapFilesystem !== 'undefined' && CapFilesystem.requestPermissions) {
+        try {
+          await CapFilesystem.requestPermissions();
+        } catch (e) {
+          console.warn("Permission request error:", e);
+        }
+      }
+
       // Gunakan Native Print Spooler bawaan browser/Android
       showToast("Membuka sistem cetak... Pilih 'Save as PDF' untuk menyimpan.", false);
       setTimeout(() => {
         window.print();
+        btn.disabled = false;
+        btn.innerHTML = originalText;
       }, 500);
     }
     
