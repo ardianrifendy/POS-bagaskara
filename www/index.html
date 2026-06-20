@@ -1048,6 +1048,7 @@
 
     /* INVOICE SHEET STYLING (FOR PRINT & DISPLAY) */
     .preview-box {
+      font-family: Arial, Helvetica, sans-serif !important; /* Wajib untuk html2canvas agar spasi tidak hilang */
       background: #fff;
       color: #1a1a1a;
       padding: 16px;
@@ -1055,6 +1056,11 @@
       box-shadow: 0 10px 30px rgba(0,0,0,0.5);
       max-width: 600px;
       margin: 0 auto 60px;
+    }
+    .preview-box * {
+      letter-spacing: normal !important; /* Hindari bug tumpang tindih huruf di html2canvas */
+      word-spacing: normal !important;
+      font-family: Arial, Helvetica, sans-serif !important;
     }
     .inv-header {
       background: #1a1a1a;
