@@ -3062,6 +3062,7 @@
   <!-- TOAST NOTIFIER -->
   <div id="toast" class="toast">Notifikasi</div>
 
+  <script src="phone-catalog.js"></script>
   <script>
     // CORE GLOBAL STATE
     let currentTab = 'dashboard';
@@ -4010,32 +4011,32 @@
     }
 
     function loadPhoneCatalog() {
-      const stored = localStorage.getItem('bagaskara_phone_catalog');
-      if (stored) {
+      // Clear legacy broken cached catalog
+      localStorage.removeItem('bagaskara_phone_catalog');
+      
+      const customStored = localStorage.getItem('bagaskara_phone_catalog_v2');
+      if (customStored) {
         try {
-          phoneCatalog = JSON.parse(stored);
-          console.log(`Loaded ${phoneCatalog.length} phones from localStorage catalog.`);
+          phoneCatalog = JSON.parse(customStored);
+          console.log(`Loaded ${phoneCatalog.length} phones from custom localStorage v2.`);
           populateKatalogFilters();
           if (currentTab === 'katalog') renderPriceCheckerList();
           return;
         } catch (e) {
-          console.error('Error parsing stored catalog, fallback to JSON:', e);
+          console.error('Failed to parse custom catalog:', e);
         }
       }
+
+      if (window.ERAFONE_CATALOG && window.ERAFONE_CATALOG.catalog) {
+        phoneCatalog = window.ERAFONE_CATALOG.catalog;
+        console.log(`Loaded ${phoneCatalog.length} phones from ERAFONE_CATALOG.`);
+      } else {
+        phoneCatalog = [];
+        console.error('ERAFONE_CATALOG is missing or empty.');
+      }
       
-      fetch('phone-catalog.json')
-        .then(response => response.json())
-        .then(data => {
-          phoneCatalog = data.catalog || data || [];
-          localStorage.setItem('bagaskara_phone_catalog', JSON.stringify(phoneCatalog));
-          console.log(`Loaded ${phoneCatalog.length} phones from default JSON catalog.`);
-          populateKatalogFilters();
-          if (currentTab === 'katalog') renderPriceCheckerList();
-        })
-        .catch(err => {
-          console.error('Error loading phone catalog:', err);
-          showToast('⚠️ Gagal memuat katalog HP!', true);
-        });
+      populateKatalogFilters();
+      if (currentTab === 'katalog') renderPriceCheckerList();
     }
 
     let lastRenderedBrandsJson = '';
@@ -5420,7 +5421,7 @@
 
     function resetCatalogToDefault() {
       if (!confirm('Apakah Anda yakin ingin merestore katalog model HP ke bawaan (default)?')) return;
-      localStorage.removeItem('bagaskara_phone_catalog');
+      localStorage.removeItem('bagaskara_phone_catalog_v2');
       loadPhoneCatalog();
       showToast('✅ Katalog HP berhasil direset ke bawaan.');
       closeSettingsSubPage();
@@ -5642,7 +5643,7 @@
         }
 
         phoneCatalog = newCatalog;
-        localStorage.setItem('bagaskara_phone_catalog', JSON.stringify(phoneCatalog));
+        localStorage.setItem('bagaskara_phone_catalog_v2', JSON.stringify(phoneCatalog));
         showToast(`✅ Berhasil mengimpor ${phoneCatalog.length} item katalog HP.`);
         closeSettingsSubPage();
         event.target.value = '';
