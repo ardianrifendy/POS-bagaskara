@@ -2035,6 +2035,12 @@
             </div>
           </div>
           <div id="laporan-period-label" style="font-size:11px; color:var(--gy); text-align:center; margin-top:-4px;"></div>
+          <div style="text-align: center; margin-top: 14px; margin-bottom: -4px;">
+            <button class="btn-secondary" onclick="exportSalesMonthlyCSV()" style="display:inline-flex; align-items:center; justify-content:center; gap:6px; font-size: 11.5px; padding: 6px 14px; border-radius: 20px; width: auto; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: #fff; cursor: pointer;">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+              Ekspor Laporan (CSV)
+            </button>
+          </div>
         </div>
 
         <!-- Profit / Loss Summary -->
@@ -2570,6 +2576,10 @@
           </div>
 
           <div style="display:flex; flex-direction:column; gap:10px;">
+            <button class="btn-secondary" onclick="exportSalesAllCSV()" style="display:flex; align-items:center; justify-content:center; gap:8px; background: rgba(247,147,26,0.1); color: var(--or); border: 1px solid rgba(247,147,26,0.2);">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+              Ekspor Semua Transaksi (CSV)
+            </button>
             <button class="btn-primary" onclick="exportDatabase()" style="display:flex; align-items:center; justify-content:center; gap:8px;">
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
               Ekspor Backup (JSON)
@@ -5471,6 +5481,78 @@
       return lines;
     }
 
+    // SALES EXPORT CSV
+    function exportSalesMonthlyCSV() {
+      const month = parseInt(document.getElementById('laporan-month').value);
+      const year  = parseInt(document.getElementById('laporan-year').value);
+      if (!month || !year) return;
+
+      const filtered = db.filter(inv => {
+        if (!inv.date) return false;
+        const [y, m] = inv.date.split('-');
+        return parseInt(y) === year && parseInt(m) === month;
+      });
+
+      if (filtered.length === 0) {
+        showToast('⚠️ Tidak ada transaksi di bulan ini', true);
+        return;
+      }
+      generateSalesCSV(filtered, `Laporan_Sales_${year}_${String(month).padStart(2,'0')}.csv`);
+    }
+
+    function exportSalesAllCSV() {
+      if (db.length === 0) {
+        showToast('⚠️ Tidak ada data transaksi', true);
+        return;
+      }
+      generateSalesCSV(db, `Semua_Transaksi_Sales.csv`);
+    }
+
+    function generateSalesCSV(transactions, fileName) {
+      const headers = ['Tanggal', 'No Invoice', 'Nama Pembeli', 'No Telp', 'Item Dibeli', 'Modal HPP (Rp)', 'Total Belanja (Rp)', 'Laba Kotor (Rp)', 'Status Bayar', 'Jumlah Dibayar (Rp)'];
+      const rows = [headers];
+
+      transactions.forEach(inv => {
+        const itemNames = inv.items.map(i => `${i.qty}x ${i.name}`).join(' | ');
+        let totalHpp = 0;
+        let totalBelanja = 0;
+        inv.items.forEach(i => {
+          totalHpp += (i.capitalPrice || 0) * i.qty;
+          totalBelanja += i.price * i.qty;
+        });
+        const labaKotor = totalBelanja - totalHpp;
+        const bayar = (inv.payments || []).reduce((sum, p) => sum + p.amount, 0);
+
+        rows.push([
+          inv.date,
+          inv.invoiceNo,
+          inv.buyerName || '-',
+          inv.buyerPhone || '-',
+          itemNames,
+          totalHpp,
+          totalBelanja,
+          labaKotor,
+          inv.status || 'lunas',
+          bayar
+        ]);
+      });
+
+      let csvContent = "";
+      rows.forEach(row => {
+        let parsedRow = row.map(col => {
+          let str = String(col);
+          if (str.includes(',') || str.includes('"') || str.includes('\n')) {
+            str = '"' + str.replace(/"/g, '""') + '"';
+          }
+          return str;
+        });
+        csvContent += parsedRow.join(',') + "\n";
+      });
+
+      downloadFile(csvContent, fileName, 'text/csv;charset=utf-8;');
+      showToast('✅ Berhasil ekspor laporan ke CSV');
+    }
+
     // BACKUP & RESTORE DATABASE
     async function exportDatabase() {
       const store = JSON.parse(localStorage.getItem('bagaskara_store_info')) || defaultStoreSettings;
@@ -6086,6 +6168,7 @@
         "Cari nama pembeli, no invoice, IMEI...": "Search customer name, invoice no, IMEI...",
         "Pengaturan": "Settings", "Toko POS & Kasir Aktif": "Active POS & Cashier Store", "Ekspor backup (JSON), impor database, atau reset data": "Export backup (JSON), import database, or reset data",
         "Edit teks garansi & catatan footer untuk tipe nota berbeda": "Edit warranty text & footer notes for different invoice types",
+        "Ekspor Laporan (CSV)": "Export Report (CSV)", "Ekspor Semua Transaksi (CSV)": "Export All Transactions (CSV)",
         "Kelola saran otomatis merek & tipe HP (ekspor/impor CSV)": "Manage brand & model autocomplete (export/import CSV)",
         "Nama, alamat, WhatsApp, Instagram, & folder simpan PDF": "Name, address, WhatsApp, Instagram, & PDF folder",
         "Pilih bahasa (Indonesian / English)": "Select language (Indonesian / English)",
@@ -6137,6 +6220,7 @@
         "Cari nama pembeli, no invoice, IMEI...": "Cari nama pembeli, no invoice, IMEI...",
         "Pengaturan": "Pengaturan", "Toko POS & Kasir Aktif": "Toko POS & Kasir Aktif", "Ekspor backup (JSON), impor database, atau reset data": "Ekspor backup (JSON), impor database, atau reset data",
         "Edit teks garansi & catatan footer untuk tipe nota berbeda": "Edit teks garansi & catatan footer untuk tipe nota berbeda",
+        "Ekspor Laporan (CSV)": "Ekspor Laporan (CSV)", "Ekspor Semua Transaksi (CSV)": "Ekspor Semua Transaksi (CSV)",
         "Kelola saran otomatis merek & tipe HP (ekspor/impor CSV)": "Kelola saran otomatis merek & tipe HP (ekspor/impor CSV)",
         "Nama, alamat, WhatsApp, Instagram, & folder simpan PDF": "Nama, alamat, WhatsApp, Instagram, & folder simpan PDF",
         "Pilih bahasa (Indonesian / English)": "Pilih bahasa (Indonesian / English)",
