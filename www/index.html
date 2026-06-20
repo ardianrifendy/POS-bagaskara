@@ -5017,12 +5017,8 @@
 
     // FUNGSI UNTUK CETAK INVOICE (DIPANGGIL DARI PREVIEW)
     function printInvoiceFromPreview() {
-      if (CapFilesystem && CapShare) {
-        if (currentPreviewData) {
-          shareInvoicePDF(currentPreviewData);
-        }
-      } else {
-        window.print();
+      if (currentPreviewData) {
+        shareInvoicePDF(currentPreviewData);
       }
     }
 
@@ -5032,182 +5028,14 @@
       const btn = document.getElementById('btn-share-pdf');
       const originalText = btn.innerHTML;
       btn.disabled = true;
-      btn.innerHTML = `<span>⏳ Membuat PDF...</span>`;
+      btn.innerHTML = `<span>⏳ Menyiapkan Cetak...</span>`;
 
-      const store = JSON.parse(localStorage.getItem('bagaskara_store_info')) || defaultStoreSettings;
-      const pdfFolder = store.pdfFolder || 'BagaskaraCell_Invoice';
-      const fileName = `Invoice_${data.invNo.replace(/\//g, '_')}.pdf`;
-
-      const original = document.getElementById('print-area');
-
-      // PENTING: left: -99999px menyebabkan blank putih pada html2canvas di Android
-      // Gunakan wrapper div dengan z-index negatif agar tidak terlihat di UI
-      // Tapi elemen clone tetap memiliki positioning normal agar ter-render sempurna
-      const wrapper = document.createElement('div');
-      wrapper.style.cssText = `
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 800px;
-        height: 1200px;
-        z-index: -9999;
-        overflow: hidden;
-        pointer-events: none;
-        background: #ffffff;
-      `;
-      
-      const clone = original.cloneNode(true);
-      // PENTING: Gunakan ukuran lebar statis (800px) agar tata letak PDF selalu rapi
-      // dan tidak "tergencet" walau digenerate dari layar HP yang sempit.
-      clone.style.width = `800px`;
-      clone.style.maxWidth = `800px`;
-      clone.style.background = '#ffffff';
-      clone.style.margin = '0';
-      
-      wrapper.appendChild(clone);
-      document.body.appendChild(wrapper);
-
-      // Tunggu semua gambar (logo, tanda tangan) selesai dimuat
-      const images = clone.querySelectorAll('img');
-      const imagePromises = Array.from(images).map(img => {
-        if (img.complete) return Promise.resolve();
-        return new Promise(resolve => {
-          img.onload = resolve;
-          img.onerror = resolve;
-        });
-      });
-
-      Promise.all(imagePromises).then(() => {
-        const opt = {
-          margin:       [10, 10, 10, 10],
-          filename:     fileName,
-          image:        { type: 'jpeg', quality: 0.98 },
-          html2canvas:  {
-            scale: 2,
-            useCORS: true,
-            allowTaint: true,
-            logging: false,
-            scrollX: 0,
-            scrollY: 0,
-            backgroundColor: '#ffffff',
-            windowWidth: 800
-          },
-          jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
-        };
-
-        html2pdf().set(opt).from(clone).outputPdf('blob').then(async function(pdfBlob) {
-          document.body.removeChild(wrapper);
-          btn.disabled = false;
-          btn.innerHTML = originalText;
-
-          // === NATIVE APP PATH (Capacitor) ===
-          if (CapFilesystem && CapShare) {
-            try {
-              // Convert blob to base64
-              const base64Data = await blobToBase64(pdfBlob);
-              
-              // Request permissions
-              if (CapFilesystem.requestPermissions) {
-                try { await CapFilesystem.requestPermissions(); } catch(e) {}
-              }
-
-              let shareUri = '';
-              
-              // 1. Write to CACHE for guaranteed sharing via FileProvider (WhatsApp)
-              try {
-                const cacheResult = await CapFilesystem.writeFile({
-                  path: fileName,
-                  data: base64Data,
-                  directory: 'CACHE'
-                });
-                shareUri = cacheResult.uri;
-              } catch (e) {
-                console.error('Failed writing to CACHE:', e);
-              }
-              
-              // 2. Try writing to DOCUMENTS for permanent storage
-              try {
-                await CapFilesystem.writeFile({
-                  path: `${pdfFolder}/${fileName}`,
-                  data: base64Data,
-                  directory: 'DOCUMENTS',
-                  recursive: true
-                });
-                showToast(`📄 PDF disimpan di Documents/${pdfFolder}/`);
-              } catch(e) {
-                console.warn('Could not write to DOCUMENTS, might be permission issue:', e);
-              }
-
-              // Trigger native share sheet immediately
-              if (shareUri) {
-                await CapShare.share({
-                  title: `Invoice ${data.invNo}`,
-                  text: `Halo, berikut invoice belanja Anda dari ${store.name}.`,
-                  url: shareUri,
-                  dialogTitle: 'Bagikan / Cetak Invoice'
-                });
-              } else {
-                throw new Error("No share URI available");
-              }
-
-            } catch(err) {
-              console.error('Native share error:', err);
-              // Fallback to Web Share API
-              fallbackWebShare(pdfBlob, fileName, data, store);
-            }
-          } else {
-            // === BROWSER/DESKTOP FALLBACK ===
-            fallbackWebShare(pdfBlob, fileName, data, store);
-          }
-        }).catch(err => {
-          if (document.body.contains(clone)) document.body.removeChild(clone);
-          console.error('PDF generation error:', err);
-          btn.disabled = false;
-          btn.innerHTML = originalText;
-          showToast("⚠️ Gagal membuat file PDF!", true);
-        });
-      });
-    }
-
-    // Helper: convert Blob to base64 string (without data URI prefix)
-    function blobToBase64(blob) {
-      return new Promise((resolve, reject) => {
-        const reader = new FileReader();
-        reader.onloadend = () => {
-          const base64 = reader.result.split(',')[1];
-          resolve(base64);
-        };
-        reader.onerror = reject;
-        reader.readAsDataURL(blob);
-      });
-    }
-
-    // Fallback share for browser / unsupported platforms
-    function fallbackWebShare(pdfBlob, fileName, data, store) {
-      const file = new File([pdfBlob], fileName, { type: 'application/pdf' });
-      
-      if (navigator.canShare && navigator.canShare({ files: [file] })) {
-        navigator.share({
-          files: [file],
-          title: `Invoice ${data.invNo}`,
-          text: `Halo, berikut invoice belanja Anda dari ${store.name}.`
-        }).then(() => {
-          showToast("Invoice berhasil dibagikan!");
-        }).catch((err) => {
-          console.log("Share cancelled:", err);
-        });
-      } else {
-        // Last resort: download file
-        const url = URL.createObjectURL(pdfBlob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = fileName;
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-        URL.revokeObjectURL(url);
-        showToast("PDF diunduh! Kirim file secara manual.", false);
-      }
+      // Gunakan Native Print Spooler bawaan browser/Android
+      setTimeout(() => {
+        window.print();
+        btn.disabled = false;
+        btn.innerHTML = originalText;
+      }, 500);
     }
 
     function executeWhatsAppShare(data) {
