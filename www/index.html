@@ -5043,25 +5043,25 @@
 
       const original = document.getElementById('print-area');
 
-      // Gunakan wrapper div dengan opacity: 0 dan position absolute agar tidak merusak scroll
-      // dan tidak menggunakan z-index negatif atau left negatif yang sering memicu bug di Android WebView
+      // Gunakan wrapper div dengan opacity: 0 dan position absolute
       const wrapper = document.createElement('div');
       wrapper.style.cssText = `
         position: absolute;
         top: 0;
         left: 0;
-        width: 800px;
+        width: 400px;
         opacity: 0.01;
         pointer-events: none;
         background: #ffffff;
       `;
       
       const clone = original.cloneNode(true);
-      clone.style.width = `800px`;
-      clone.style.maxWidth = `800px`;
+      // PENTING: Gunakan 400px (mendekati layar HP) agar font tidak terlihat kecil/aneh
+      clone.style.width = `400px`;
+      clone.style.maxWidth = `400px`;
       clone.style.background = '#ffffff';
       clone.style.margin = '0';
-      clone.style.padding = '20px';
+      clone.style.padding = '16px';
       
       wrapper.appendChild(clone);
       document.body.appendChild(wrapper);
@@ -5078,24 +5078,22 @@
 
       Promise.all(imagePromises).then(() => {
         // PENGATURAN KUNCI UNTUK MENCEGAH LAYOUT "ANEH/TERGENCET"
-        // 1. html2canvas windowWidth diset persis 800px
-        // 2. jsPDF menggunakan unit 'px' dengan format [800, 1131] (Rasio A4 1:1.414)
-        // Hal ini memaksa setiap 1 pixel HTML dirender murni sebagai 1 pixel di PDF tanpa kompresi milimeter.
+        // Kita paksa render di 400px agar font proporsional, dengan skala 3x agar tidak pecah.
         const opt = {
           margin:       0,
           filename:     fileName,
           image:        { type: 'jpeg', quality: 1.0 },
           html2canvas:  {
-            scale: 2,
+            scale: 3,
             useCORS: true,
             allowTaint: true,
             logging: false,
             scrollX: 0,
             scrollY: 0,
             backgroundColor: '#ffffff',
-            windowWidth: 800
+            windowWidth: 400
           },
-          jsPDF:        { unit: 'px', format: [800, 1131], orientation: 'portrait', hotfixes: ["px_scaling"] }
+          jsPDF:        { unit: 'px', format: [400, 565], orientation: 'portrait', hotfixes: ["px_scaling"] }
         };
 
         html2pdf().set(opt).from(clone).outputPdf('blob').then(async function(pdfBlob) {
