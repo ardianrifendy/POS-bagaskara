@@ -5049,19 +5049,19 @@
         position: absolute;
         top: 0;
         left: 0;
-        width: 400px;
+        width: 1000px;
         opacity: 0.01;
         pointer-events: none;
         background: #ffffff;
       `;
       
       const clone = original.cloneNode(true);
-      // PENTING: Gunakan 400px (mendekati layar HP) agar font tidak terlihat kecil/aneh
-      clone.style.width = `400px`;
-      clone.style.maxWidth = `400px`;
+      // PENTING: Gunakan layout LEBAR (1000px) agar sama persis seperti versi Desktop/Web
+      clone.style.width = `1000px`;
+      clone.style.maxWidth = `1000px`;
       clone.style.background = '#ffffff';
       clone.style.margin = '0';
-      clone.style.padding = '16px';
+      clone.style.padding = '40px'; // Beri ruang lega seperti kertas sungguhan
       
       wrapper.appendChild(clone);
       document.body.appendChild(wrapper);
@@ -5077,23 +5077,23 @@
       });
 
       Promise.all(imagePromises).then(() => {
-        // PENGATURAN KUNCI UNTUK MENCEGAH LAYOUT "ANEH/TERGENCET"
-        // Kita paksa render di 400px agar font proporsional, dengan skala 3x agar tidak pecah.
+        // PENGATURAN KUNCI UNTUK MENDAPATKAN HASIL CETAK LANDSCAPE LETTER
+        // Sama persis dengan screenshot PC: Kertas Letter, Orientasi Landscape.
         const opt = {
-          margin:       0,
+          margin:       0.2,
           filename:     fileName,
           image:        { type: 'jpeg', quality: 1.0 },
           html2canvas:  {
-            scale: 3,
+            scale: 2,
             useCORS: true,
             allowTaint: true,
             logging: false,
             scrollX: 0,
             scrollY: 0,
             backgroundColor: '#ffffff',
-            windowWidth: 400
+            windowWidth: 1000
           },
-          jsPDF:        { unit: 'px', format: [400, 565], orientation: 'portrait', hotfixes: ["px_scaling"] }
+          jsPDF:        { unit: 'in', format: 'letter', orientation: 'landscape' }
         };
 
         html2pdf().set(opt).from(clone).outputPdf('blob').then(async function(pdfBlob) {
