@@ -307,3 +307,33 @@ Semua tahap awal sudah selesai. Ide pengembangan berikutnya yang bisa dipertimba
 - **Export Laporan PDF**: Cetak laporan laba/rugi bulanan sebagai file PDF.
 - **Grafik Visual**: Chart omset harian/bulanan menggunakan library ringan (misal Chart.js).
 - **QRIS Payment Integration**: Integrasi pembayaran QRIS untuk kemudahan transaksi digital.
+
+---
+
+## 8. Log Pembaruan Terakhir (Update Database Erafone & Fix PDF)
+
+Bagian ini mencatat pembaruan besar, kendala yang dihadapi, dan solusi teknis yang diterapkan pada sesi pengerjaan terakhir.
+
+### A. Update Sistem Katalog Produk (Database Erafone)
+- **Kendala**: Import database dari `update database.csv` (815+ entri) melalui sistem `fetch()` sebelumnya sering mengalami masalah *caching* di mobile, dan sistem lama memerlukan manajemen stok yang tidak relevan untuk database Erafone. Pengguna juga kesulitan melakukan *filter* karena UI filter sebelumnya tersembunyi dan tidak mendukung pemilihan ganda.
+- **Solusi**: 
+  - Mengubah arsitektur *parser* menggunakan skrip Python eksternal (`parse_erafone.py`) untuk mem- *build* file JavaScript statis (`phone-catalog.js`). Objek `window.ERAFONE_CATALOG` langsung diinjeksi ke aplikasi, 100% menghilangkan masalah *cache*.
+  - Mengimplementasikan `localStorage` versi `v2` (`bagaskara_products_v2`) untuk memisahkan produk kustom milik pengguna dari database statis Erafone.
+- **Update UI**: 
+  - Merombak *Filter Modal*: Kategori diletakkan di atas Merek.
+  - Menerapkan **Multi-Select Filter** menggunakan objek `Set()` di JavaScript. Pengguna sekarang dapat menekan banyak tombol merek/kategori sekaligus (ditandai dengan *class* `active` / warna oranye), dan memiliki tombol "Semua" yang secara otomatis mereset pilihan.
+
+### B. Perbaikan Bug PDF Invoice (Blank & Gagal Share)
+- **Kendala 1 (PDF Blank)**: Saat menekan tombol "Bagikan WA" dari Riwayat, `html2canvas` menghasilkan PDF putih kosong di Android.
+- **Solusi 1**: Mengganti teknik *cloning* dari yang sebelumnya dilempar ke luar layar (`left: -99999px`) menjadi `position: fixed` dengan `width: 800px` dan `z-index: -9999`. Teknik lama dianggap elemen tidak valid oleh *engine WebView* Android sehingga tidak di- *render*, sedangkan teknik baru memanipulasi *stacking context* secara aman.
+- **Kendala 2 (File Not Found saat Share)**: Fitur bagikan menampilkan *toast* "Invoice disimpan" tapi file gagal terkirim ke WhatsApp. Ini terjadi karena Android 11+ memblokir akses file `DOCUMENTS` tanpa *permission* eksplisit, dan `FileProvider` Capacitor kesulitan membaca *path* tersebut.
+- **Solusi 2**: Mengubah jalur penyimpanan file. PDF sekarang dipaksa disimpan ke direktori `CACHE` internal (yang 100% kebal dari *permission blocking* Android) khusus untuk dikirim via WA, lalu aplikasi "mengetuk pintu" meminta izin `CapFilesystem.requestPermissions()` sebelum menyimpannya ke `DOCUMENTS` sebagai cadangan.
+
+### C. Perbaikan Tipografi & Tata Letak PDF (Layout Tergencet & Tumpang Tindih)
+- **Kendala 3 (Teks Tumpang Tindih)**: Di versi mobile, spasi antar kata hilang (contoh: `Nama:IstrikuTercinta`) karena `html2canvas` gagal menghitung metrik *font custom* (`Outfit`) dan terpengaruh *subpixel rounding* dari layar HP resolusi tinggi.
+- **Solusi 3**: 
+  - Mengunci *font* khusus elemen `.preview-box` (area cetak) menjadi `Arial, Helvetica, sans-serif !important`.
+  - Mereset jarak huruf `letter-spacing: 0 !important` dan menambahkan `text-rendering: geometricPrecision !important` untuk presisi gambar metrik.
+  - Menyelipkan entitas HTML spasi mati (`&nbsp;`) setelah tag `<strong>` pada nama/invoice agar Android tidak menelan (*collapse*) spasi kosong tersebut.
+- **Kendala 4 (Layout Sempit/Tergencet)**: Desain PDF terlihat "tidak aturan" karena `html2canvas` menangkap lebar kanvas berdasarkan lebar layar HP (`original.offsetWidth` ~360px), lalu memelarkannya ke ukuran A4.
+- **Solusi 4**: Menanamkan *hardcode* lebar mutlak `width: 800px` pada elemen *clone* dan kontainer *wrapper*, serta menset parameter `windowWidth: 800` pada konfigurasi `html2canvas`. Ini menipu *engine* HP agar berpikir bahwa ia adalah layar komputer lebar saat memproses gambar, menghasilkan tabel dan tata letak berproporsi desktop A4 yang lega dan presisi.
