@@ -111,6 +111,19 @@
       font-weight: 500;
       margin-top: 1px;
     }
+    .tb-clock {
+      font-size: 13.5px;
+      font-weight: 700;
+      color: var(--or);
+      background: rgba(247, 147, 26, 0.12);
+      padding: 6px 12px;
+      border-radius: 10px;
+      letter-spacing: 0.5px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-variant-numeric: tabular-nums;
+    }
 
     /* BOTTOM NAV BAR */
     .bottom-nav {
@@ -1855,6 +1868,7 @@
         <div class="tb-date" id="tb-date"></div>
       </div>
     </div>
+    <div class="tb-clock" id="tb-clock"></div>
   </div>
 
   <!-- MAIN TAB WRAPPERS -->
@@ -3015,6 +3029,10 @@
 
       // Apply UI Scale
       applyZoom();
+
+      // Initialize Digital Clock
+      setInterval(updateClock, 1000);
+      updateClock();
 
       // Hide live-banner on initial load (non-form tab)
       const liveBanner = document.querySelector('.live-banner');
@@ -6360,6 +6378,16 @@
           btnLight.style.color = 'var(--gy)';
         }
       }
+    }
+
+    function updateClock() {
+      const clockEl = document.getElementById('tb-clock');
+      if (!clockEl) return;
+      const now = new Date();
+      const hrs = String(now.getHours()).padStart(2, '0');
+      const mins = String(now.getMinutes()).padStart(2, '0');
+      const secs = String(now.getSeconds()).padStart(2, '0');
+      clockEl.innerHTML = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="opacity:0.8;"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> <span>${hrs}:${mins}</span><span style="opacity: 0.5; font-size: 11px;">:${secs}</span>`;
     }
 
     let currentZoom = parseFloat(localStorage.getItem('bagaskara_zoom')) || 1.0;
