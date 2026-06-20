@@ -5095,35 +5095,49 @@
               // Convert blob to base64
               const base64Data = await blobToBase64(pdfBlob);
               
-              // Ensure folder exists
+              // Request permissions
+              if (CapFilesystem.requestPermissions) {
+                try { await CapFilesystem.requestPermissions(); } catch(e) {}
+              }
+
+              let shareUri = '';
+              
+              // 1. Write to CACHE for guaranteed sharing via FileProvider (WhatsApp)
               try {
-                await CapFilesystem.mkdir({
-                  path: pdfFolder,
+                const cacheResult = await CapFilesystem.writeFile({
+                  path: fileName,
+                  data: base64Data,
+                  directory: 'CACHE'
+                });
+                shareUri = cacheResult.uri;
+              } catch (e) {
+                console.error('Failed writing to CACHE:', e);
+              }
+              
+              // 2. Try writing to DOCUMENTS for permanent storage
+              try {
+                await CapFilesystem.writeFile({
+                  path: `${pdfFolder}/${fileName}`,
+                  data: base64Data,
                   directory: 'DOCUMENTS',
                   recursive: true
                 });
-              } catch(e) { /* folder may already exist */ }
-
-              // Write PDF file to Documents/<pdfFolder>/
-              const writeResult = await CapFilesystem.writeFile({
-                path: `${pdfFolder}/${fileName}`,
-                data: base64Data,
-                directory: 'DOCUMENTS',
-                recursive: true
-              });
-
-              showToast(`📄 PDF disimpan di Documents/${pdfFolder}/`);
-
-              // Get the URI for sharing/printing
-              const fileUri = writeResult.uri;
+                showToast(`📄 PDF disimpan di Documents/${pdfFolder}/`);
+              } catch(e) {
+                console.warn('Could not write to DOCUMENTS, might be permission issue:', e);
+              }
 
               // Trigger native share sheet immediately
-              await CapShare.share({
-                title: `Invoice ${data.invNo}`,
-                text: `Halo, berikut invoice belanja Anda dari ${store.name}.`,
-                url: fileUri,
-                dialogTitle: 'Bagikan / Cetak Invoice'
-              });
+              if (shareUri) {
+                await CapShare.share({
+                  title: `Invoice ${data.invNo}`,
+                  text: `Halo, berikut invoice belanja Anda dari ${store.name}.`,
+                  url: shareUri,
+                  dialogTitle: 'Bagikan / Cetak Invoice'
+                });
+              } else {
+                throw new Error("No share URI available");
+              }
 
             } catch(err) {
               console.error('Native share error:', err);
