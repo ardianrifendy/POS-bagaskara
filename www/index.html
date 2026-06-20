@@ -2296,8 +2296,19 @@
     <!-- TAB 5: KATALOG / CEK HARGA -->
     <div id="tab-katalog" class="tab-content" style="padding:16px;">
       <h2 style="margin-top:0; margin-bottom:16px; font-size:20px;">Cek Harga Katalog</h2>
-      <input type="text" id="pc-search-input" placeholder="Ketik merek atau tipe HP..." oninput="renderPriceCheckerList()" style="width:100%; padding: 14px 16px; border-radius:12px; background:var(--bk3); border:1px solid rgba(255,255,255,0.08); color:#fff; outline:none; font-size:14px; margin-bottom:16px;">
-      <div id="pc-results-list" style="display:flex; flex-direction:column; gap:10px;"></div>
+      <input type="text" id="pc-search-input" placeholder="Ketik merek atau tipe HP..." oninput="renderPriceCheckerList()" style="width:100%; padding: 14px 16px; border-radius:12px; background:var(--bk3); border:1px solid rgba(255,255,255,0.08); color:#fff; outline:none; font-size:14px; margin-bottom:12px;">
+      
+      <!-- Price Filters -->
+      <div style="display:flex; gap:8px; overflow-x:auto; margin-bottom:16px; padding-bottom:4px;" class="hide-scroll" id="pc-price-filters">
+        <button class="chip active" data-range="all" onclick="setPriceFilter('all')">Semua</button>
+        <button class="chip" data-range="under1" onclick="setPriceFilter('under1')">< Rp 1 Jt</button>
+        <button class="chip" data-range="1to3" onclick="setPriceFilter('1to3')">Rp 1-3 Jt</button>
+        <button class="chip" data-range="3to5" onclick="setPriceFilter('3to5')">Rp 3-5 Jt</button>
+        <button class="chip" data-range="5to10" onclick="setPriceFilter('5to10')">Rp 5-10 Jt</button>
+        <button class="chip" data-range="above10" onclick="setPriceFilter('above10')">> Rp 10 Jt</button>
+      </div>
+
+      <div id="pc-results-list" style="display:flex; flex-direction:column; gap:10px; padding-bottom:100px;"></div>
     </div>
 
     <!-- TAB 4: PENGATURAN / SETTINGS -->
@@ -3159,8 +3170,7 @@
       } else if (tabId === 'settings') {
         updateBackupSummary();
       } else if (tabId === 'katalog') {
-        const inp = document.getElementById('pc-search-input');
-        if (inp.value === '') renderPriceCheckerList();
+        renderPriceCheckerList();
       }
       
       // Auto-scroll to top
@@ -3974,6 +3984,7 @@
         try {
           phoneCatalog = JSON.parse(stored);
           console.log(`Loaded ${phoneCatalog.length} phones from localStorage catalog.`);
+          if (currentTab === 'katalog') renderPriceCheckerList();
           return;
         } catch (e) {
           console.error('Error parsing stored catalog, fallback to JSON:', e);
@@ -3986,6 +3997,7 @@
           phoneCatalog = data.catalog || data || [];
           localStorage.setItem('bagaskara_phone_catalog', JSON.stringify(phoneCatalog));
           console.log(`Loaded ${phoneCatalog.length} phones from default JSON catalog.`);
+          if (currentTab === 'katalog') renderPriceCheckerList();
         })
         .catch(err => {
           console.error('Error loading phone catalog:', err);
@@ -4356,17 +4368,49 @@
     }
 
     // PRICE CHECKER LOGIC
+    let currentPcPriceFilter = 'all';
+
+    function setPriceFilter(range) {
+      currentPcPriceFilter = range;
+      document.querySelectorAll('#pc-price-filters .chip').forEach(c => {
+        if (c.dataset.range === range) c.classList.add('active');
+        else c.classList.remove('active');
+      });
+      renderPriceCheckerList();
+    }
+
     function renderPriceCheckerList() {
       const list = document.getElementById('pc-results-list');
       list.innerHTML = '';
-      const val = document.getElementById('pc-search-input').value.toLowerCase().trim();
       
+      if (!phoneCatalog || phoneCatalog.length === 0) {
+        list.innerHTML = `<div style="text-align:center; padding: 20px; color: var(--gy); font-size: 13px;">Sedang memuat data katalog...</div>`;
+        return;
+      }
+
+      const val = document.getElementById('pc-search-input').value.toLowerCase().trim();
       let filtered = phoneCatalog;
+
+      // Apply price filter
+      if (currentPcPriceFilter !== 'all') {
+        filtered = filtered.filter(p => {
+          if (!p.price) return false;
+          if (currentPcPriceFilter === 'under1') return p.price < 1000000;
+          if (currentPcPriceFilter === '1to3') return p.price >= 1000000 && p.price < 3000000;
+          if (currentPcPriceFilter === '3to5') return p.price >= 3000000 && p.price < 5000000;
+          if (currentPcPriceFilter === '5to10') return p.price >= 5000000 && p.price <= 10000000;
+          if (currentPcPriceFilter === 'above10') return p.price > 10000000;
+          return true;
+        });
+      }
+
+      // Apply text search
       if (val) {
         filtered = filtered.filter(x => x.model.toLowerCase().includes(val) || x.brand.toLowerCase().includes(val));
-      } else {
-        filtered = filtered.slice(0, 30); // show top 30 initially
       }
+
+      // Limit results to top 100 for performance (to not freeze UI)
+      filtered = filtered.slice(0, 100);
 
       if (filtered.length === 0) {
         list.innerHTML = `<div style="text-align:center; padding: 20px; color: var(--gy); font-size: 13px;">Tidak ada hasil ditemukan.</div>`;
