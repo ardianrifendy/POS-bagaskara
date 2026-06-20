@@ -2970,14 +2970,14 @@
           <button class="chip" data-val="above10" onclick="kfSelect('price', 'above10')">> Rp 10 Jt</button>
         </div>
 
-        <div style="font-size:12px; color:var(--gy); margin-bottom:8px; font-weight:700;">MEREK</div>
-        <div style="display:flex; flex-wrap:wrap; gap:8px; margin-bottom:20px;" id="kf-brand">
-          <!-- Brands injected here -->
-        </div>
-
         <div style="font-size:12px; color:var(--gy); margin-bottom:8px; font-weight:700;">KATEGORI</div>
         <div style="display:flex; flex-wrap:wrap; gap:8px; margin-bottom:20px;" id="kf-category">
           <!-- Categories injected here -->
+        </div>
+
+        <div style="font-size:12px; color:var(--gy); margin-bottom:8px; font-weight:700;">MEREK</div>
+        <div style="display:flex; flex-wrap:wrap; gap:8px; margin-bottom:20px;" id="kf-brand">
+          <!-- Brands injected here -->
         </div>
       </div>
 
@@ -4403,8 +4403,8 @@
 
     // PRICE CHECKER LOGIC
     let currentPcPriceFilter = 'all';
-    let currentPcBrandFilter = 'all';
-    let currentPcCategoryFilter = 'all';
+    let currentPcBrandFilters = new Set();
+    let currentPcCategoryFilters = new Set();
 
     function populateKatalogFilters() {
       const brands = new Set();
@@ -4437,15 +4437,31 @@
     }
     
     function kfSelect(type, val) {
-      if(type === 'price') currentPcPriceFilter = val;
-      if(type === 'brand') currentPcBrandFilter = val;
-      if(type === 'category') currentPcCategoryFilter = val;
-      
-      document.querySelectorAll(`#kf-${type} .chip`).forEach(c => {
-        if(c.dataset.val === val) c.classList.add('active');
-        else c.classList.remove('active');
-      });
-      // Do not re-render yet until 'Terapkan' is clicked, just update UI
+      if(type === 'price') {
+        currentPcPriceFilter = val;
+        document.querySelectorAll(`#kf-price .chip`).forEach(c => {
+          if(c.dataset.val === val) c.classList.add('active');
+          else c.classList.remove('active');
+        });
+      } else {
+        const filters = type === 'brand' ? currentPcBrandFilters : currentPcCategoryFilters;
+        if(val === 'all') {
+          filters.clear();
+        } else {
+          if(filters.has(val)) filters.delete(val);
+          else filters.add(val);
+        }
+        
+        document.querySelectorAll(`#kf-${type} .chip`).forEach(c => {
+          if(c.dataset.val === 'all') {
+            if(filters.size === 0) c.classList.add('active');
+            else c.classList.remove('active');
+          } else {
+            if(filters.has(c.dataset.val)) c.classList.add('active');
+            else c.classList.remove('active');
+          }
+        });
+      }
     }
 
     function kfReset() {
@@ -4480,13 +4496,13 @@
       }
 
       // Apply brand filter
-      if (currentPcBrandFilter !== 'all') {
-        filtered = filtered.filter(p => p.brand === currentPcBrandFilter);
+      if (currentPcBrandFilters.size > 0) {
+        filtered = filtered.filter(p => currentPcBrandFilters.has(p.brand));
       }
       
       // Apply category filter
-      if (currentPcCategoryFilter !== 'all') {
-        filtered = filtered.filter(p => p.category === currentPcCategoryFilter);
+      if (currentPcCategoryFilters.size > 0) {
+        filtered = filtered.filter(p => currentPcCategoryFilters.has(p.category));
       }
 
       // Apply text search
