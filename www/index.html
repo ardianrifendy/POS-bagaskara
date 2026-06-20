@@ -2758,8 +2758,12 @@
 
     <!-- FLOATING ACTIONS IN PREVIEW -->
     <div class="action-row">
-      <button class="btn-print" onclick="printInvoiceFromPreview()" style="width:100%; font-weight:bold;">
-        🖨️ Simpan / Cetak Invoice
+      <button class="btn-wa" id="btn-share-pdf" onclick="shareToWhatsAppFromPreview()" style="background:var(--or);">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 6 2 18 2 18 9"></polyline><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path><rect x="6" y="14" width="12" height="8"></rect></svg>
+        Simpan / Bagikan PDF
+      </button>
+      <button class="btn-print" onclick="printInvoiceFromPreview()">
+        🖨️ Cetak Invoice (Native)
       </button>
     </div>
   </div>
@@ -5011,28 +5015,10 @@
     }
 
     // FUNGSI UNTUK CETAK INVOICE (DIPANGGIL DARI PREVIEW)
-    async function printInvoiceFromPreview() {
-      const btn = document.querySelector('.btn-print');
-      const originalText = btn.innerHTML;
-      btn.disabled = true;
-      btn.innerHTML = `<span>⏳ Menyiapkan Cetak...</span>`;
-
-      // Minta izin storage terlebih dahulu agar Android Print Spooler memiliki akses tulis
-      if (typeof CapFilesystem !== 'undefined' && CapFilesystem.requestPermissions) {
-        try {
-          await CapFilesystem.requestPermissions();
-        } catch (e) {
-          console.warn("Permission request error:", e);
-        }
-      }
-
+    // FUNGSI UNTUK CETAK INVOICE (DIPANGGIL DARI PREVIEW)
+    function printInvoiceFromPreview() {
       // Gunakan Native Print Spooler bawaan browser/Android
-      showToast("Membuka sistem cetak... Pilih 'Save as PDF' untuk menyimpan.", false);
-      setTimeout(() => {
-        window.print();
-        btn.disabled = false;
-        btn.innerHTML = originalText;
-      }, 500);
+      window.print();
     }
     
     // Listener untuk mendeteksi saat dialog print ditutup
@@ -5041,6 +5027,176 @@
         showToast("📄 Jika Anda menyimpan PDF, silakan periksa folder 'Unduhan' atau 'Documents' di HP Anda.", false);
       }, 1000);
     });
+
+    // FUNGSI UNTUK MENYIMPAN PDF DAN SHARE (DARI PREVIEW)
+    function shareInvoicePDF(data) {
+      if (!data) return;
+      
+      const btn = document.getElementById('btn-share-pdf');
+      const originalText = btn.innerHTML;
+      btn.disabled = true;
+      btn.innerHTML = `<span>⏳ Membuat PDF...</span>`;
+
+      const store = JSON.parse(localStorage.getItem('bagaskara_store_info')) || defaultStoreSettings;
+      const pdfFolder = store.pdfFolder || 'BagaskaraCell_Invoice';
+      const fileName = `Invoice_${data.invNo.replace(/\//g, '_')}.pdf`;
+
+      const original = document.getElementById('print-area');
+
+      // Gunakan wrapper div dengan opacity: 0 dan position absolute agar tidak merusak scroll
+      // dan tidak menggunakan z-index negatif atau left negatif yang sering memicu bug di Android WebView
+      const wrapper = document.createElement('div');
+      wrapper.style.cssText = `
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 800px;
+        opacity: 0.01;
+        pointer-events: none;
+        background: #ffffff;
+      `;
+      
+      const clone = original.cloneNode(true);
+      clone.style.width = `800px`;
+      clone.style.maxWidth = `800px`;
+      clone.style.background = '#ffffff';
+      clone.style.margin = '0';
+      clone.style.padding = '20px';
+      
+      wrapper.appendChild(clone);
+      document.body.appendChild(wrapper);
+
+      // Tunggu semua gambar (logo, tanda tangan) selesai dimuat
+      const images = clone.querySelectorAll('img');
+      const imagePromises = Array.from(images).map(img => {
+        if (img.complete) return Promise.resolve();
+        return new Promise(resolve => {
+          img.onload = resolve;
+          img.onerror = resolve;
+        });
+      });
+
+      Promise.all(imagePromises).then(() => {
+        // PENGATURAN KUNCI UNTUK MENCEGAH LAYOUT "ANEH/TERGENCET"
+        // 1. html2canvas windowWidth diset persis 800px
+        // 2. jsPDF menggunakan unit 'px' dengan format [800, 1131] (Rasio A4 1:1.414)
+        // Hal ini memaksa setiap 1 pixel HTML dirender murni sebagai 1 pixel di PDF tanpa kompresi milimeter.
+        const opt = {
+          margin:       0,
+          filename:     fileName,
+          image:        { type: 'jpeg', quality: 1.0 },
+          html2canvas:  {
+            scale: 2,
+            useCORS: true,
+            allowTaint: true,
+            logging: false,
+            scrollX: 0,
+            scrollY: 0,
+            backgroundColor: '#ffffff',
+            windowWidth: 800
+          },
+          jsPDF:        { unit: 'px', format: [800, 1131], orientation: 'portrait', hotfixes: ["px_scaling"] }
+        };
+
+        html2pdf().set(opt).from(clone).outputPdf('blob').then(async function(pdfBlob) {
+          document.body.removeChild(wrapper);
+          btn.disabled = false;
+          btn.innerHTML = originalText;
+
+          // === NATIVE APP PATH (Capacitor) ===
+          if (typeof CapFilesystem !== 'undefined' && typeof CapShare !== 'undefined') {
+            try {
+              const base64Data = await blobToBase64(pdfBlob);
+              
+              if (CapFilesystem.requestPermissions) {
+                try { await CapFilesystem.requestPermissions(); } catch(e) {}
+              }
+
+              let shareUri = '';
+              try {
+                const cacheResult = await CapFilesystem.writeFile({
+                  path: fileName,
+                  data: base64Data,
+                  directory: 'CACHE'
+                });
+                shareUri = cacheResult.uri;
+              } catch (e) {
+                console.error('Failed writing to CACHE:', e);
+              }
+              
+              try {
+                await CapFilesystem.writeFile({
+                  path: `${pdfFolder}/${fileName}`,
+                  data: base64Data,
+                  directory: 'DOCUMENTS',
+                  recursive: true
+                });
+                showToast(`📄 PDF disimpan di Documents/${pdfFolder}/`);
+              } catch(e) {
+                console.warn('Could not write to DOCUMENTS:', e);
+              }
+
+              if (shareUri) {
+                await CapShare.share({
+                  title: `Invoice ${data.invNo}`,
+                  text: `Halo, berikut invoice belanja Anda dari ${store.name}.`,
+                  url: shareUri,
+                  dialogTitle: 'Bagikan / Cetak Invoice'
+                });
+              } else {
+                throw new Error("No share URI available");
+              }
+            } catch (err) {
+              console.error('File Error:', err);
+              showToast('❌ Gagal membagikan PDF (Akses Ditolak)');
+              fallbackWebShare(pdfBlob, fileName, data, store);
+            }
+          } 
+          // === BROWSER / WEB PATH ===
+          else {
+            fallbackWebShare(pdfBlob, fileName, data, store);
+          }
+        });
+      });
+    }
+
+    function blobToBase64(blob) {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onloadend = () => {
+          const base64 = reader.result.split(',')[1];
+          resolve(base64);
+        };
+        reader.onerror = reject;
+        reader.readAsDataURL(blob);
+      });
+    }
+
+    function fallbackWebShare(pdfBlob, fileName, data, store) {
+      const file = new File([pdfBlob], fileName, { type: 'application/pdf' });
+      
+      if (navigator.canShare && navigator.canShare({ files: [file] })) {
+        navigator.share({
+          files: [file],
+          title: `Invoice ${data.invNo}`,
+          text: `Halo, berikut invoice belanja Anda dari ${store.name}.`
+        }).then(() => {
+          showToast("Invoice berhasil dibagikan!");
+        }).catch((err) => {
+          console.log("Share cancelled:", err);
+        });
+      } else {
+        const url = URL.createObjectURL(pdfBlob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = fileName;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+        showToast("PDF diunduh! Kirim file secara manual.", false);
+      }
+    }
 
     function executeWhatsAppShare(data) {
       const store = JSON.parse(localStorage.getItem('bagaskara_store_info')) || defaultStoreSettings;
