@@ -2296,16 +2296,13 @@
     <!-- TAB 5: KATALOG / CEK HARGA -->
     <div id="tab-katalog" class="tab-content" style="padding:16px;">
       <h2 style="margin-top:0; margin-bottom:16px; font-size:20px;">Cek Harga Katalog</h2>
-      <input type="text" id="pc-search-input" placeholder="Ketik merek atau tipe HP..." oninput="renderPriceCheckerList()" style="width:100%; padding: 14px 16px; border-radius:12px; background:var(--bk3); border:1px solid rgba(255,255,255,0.08); color:#fff; outline:none; font-size:14px; margin-bottom:12px;">
-      
-      <!-- Price Filters -->
-      <div style="display:flex; gap:8px; overflow-x:auto; margin-bottom:16px; padding-bottom:4px;" class="hide-scroll" id="pc-price-filters">
-        <button class="chip active" data-range="all" onclick="setPriceFilter('all')">Semua</button>
-        <button class="chip" data-range="under1" onclick="setPriceFilter('under1')">< Rp 1 Jt</button>
-        <button class="chip" data-range="1to3" onclick="setPriceFilter('1to3')">Rp 1-3 Jt</button>
-        <button class="chip" data-range="3to5" onclick="setPriceFilter('3to5')">Rp 3-5 Jt</button>
-        <button class="chip" data-range="5to10" onclick="setPriceFilter('5to10')">Rp 5-10 Jt</button>
-        <button class="chip" data-range="above10" onclick="setPriceFilter('above10')">> Rp 10 Jt</button>
+      <div style="display:flex; gap:10px; margin-bottom:16px;">
+        <div style="flex:1; position:relative;">
+          <input type="text" id="pc-search-input" placeholder="Ketik merek atau tipe HP..." oninput="renderPriceCheckerList()" style="width:100%; padding: 14px 16px; border-radius:12px; background:var(--bk3); border:1px solid rgba(255,255,255,0.08); color:#fff; outline:none; font-size:14px;">
+        </div>
+        <button onclick="openKatalogFilterModal()" style="background:var(--bk3); border:1px solid rgba(255,255,255,0.08); border-radius:12px; padding:0 16px; color:#fff; display:flex; align-items:center; justify-content:center; cursor:pointer;">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon></svg>
+        </button>
       </div>
 
       <div id="pc-results-list" style="display:flex; flex-direction:column; gap:10px; padding-bottom:100px;"></div>
@@ -2953,6 +2950,40 @@
       <div style="display:flex; gap:10px; margin-top:8px;">
         <button class="btn-secondary" onclick="closeCicilanModal()" style="flex:1;">Batal</button>
         <button class="btn-primary" onclick="saveCicilan()" style="flex:2;">Simpan Cicilan</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- KATALOG FILTER MODAL -->
+  <div class="cicilan-overlay" id="katalog-filter-modal" onclick="if(event.target===this)closeKatalogFilterModal()">
+    <div class="cicilan-sheet" style="max-height: 85vh; display:flex; flex-direction:column;">
+      <h3 style="margin-top:0; font-size:16px; color:#fff; margin-bottom:16px;">Filter Katalog</h3>
+      
+      <div style="flex:1; overflow-y:auto; padding-right:4px;">
+        <div style="font-size:12px; color:var(--gy); margin-bottom:8px; font-weight:700;">HARGA</div>
+        <div style="display:flex; flex-wrap:wrap; gap:8px; margin-bottom:20px;" id="kf-price">
+          <button class="chip active" data-val="all" onclick="kfSelect('price', 'all')">Semua</button>
+          <button class="chip" data-val="under1" onclick="kfSelect('price', 'under1')">< Rp 1 Jt</button>
+          <button class="chip" data-val="1to3" onclick="kfSelect('price', '1to3')">Rp 1-3 Jt</button>
+          <button class="chip" data-val="3to5" onclick="kfSelect('price', '3to5')">Rp 3-5 Jt</button>
+          <button class="chip" data-val="5to10" onclick="kfSelect('price', '5to10')">Rp 5-10 Jt</button>
+          <button class="chip" data-val="above10" onclick="kfSelect('price', 'above10')">> Rp 10 Jt</button>
+        </div>
+
+        <div style="font-size:12px; color:var(--gy); margin-bottom:8px; font-weight:700;">MEREK</div>
+        <div style="display:flex; flex-wrap:wrap; gap:8px; margin-bottom:20px;" id="kf-brand">
+          <!-- Brands injected here -->
+        </div>
+
+        <div style="font-size:12px; color:var(--gy); margin-bottom:8px; font-weight:700;">KATEGORI</div>
+        <div style="display:flex; flex-wrap:wrap; gap:8px; margin-bottom:20px;" id="kf-category">
+          <!-- Categories injected here -->
+        </div>
+      </div>
+
+      <div style="display:flex; gap:10px; margin-top:20px;">
+        <button class="btn-secondary" onclick="kfReset()" style="flex:1;">Reset</button>
+        <button class="btn-primary" onclick="closeKatalogFilterModal()" style="flex:2;">Terapkan</button>
       </div>
     </div>
   </div>
@@ -3984,6 +4015,7 @@
         try {
           phoneCatalog = JSON.parse(stored);
           console.log(`Loaded ${phoneCatalog.length} phones from localStorage catalog.`);
+          populateKatalogFilters();
           if (currentTab === 'katalog') renderPriceCheckerList();
           return;
         } catch (e) {
@@ -3997,6 +4029,7 @@
           phoneCatalog = data.catalog || data || [];
           localStorage.setItem('bagaskara_phone_catalog', JSON.stringify(phoneCatalog));
           console.log(`Loaded ${phoneCatalog.length} phones from default JSON catalog.`);
+          populateKatalogFilters();
           if (currentTab === 'katalog') renderPriceCheckerList();
         })
         .catch(err => {
@@ -4369,14 +4402,55 @@
 
     // PRICE CHECKER LOGIC
     let currentPcPriceFilter = 'all';
+    let currentPcBrandFilter = 'all';
+    let currentPcCategoryFilter = 'all';
 
-    function setPriceFilter(range) {
-      currentPcPriceFilter = range;
-      document.querySelectorAll('#pc-price-filters .chip').forEach(c => {
-        if (c.dataset.range === range) c.classList.add('active');
+    function populateKatalogFilters() {
+      const brands = new Set();
+      const cats = new Set();
+      phoneCatalog.forEach(p => {
+        if(p.brand) brands.add(p.brand);
+        if(p.category) cats.add(p.category);
+      });
+      
+      let bHtml = `<button class="chip active" data-val="all" onclick="kfSelect('brand', 'all')">Semua</button>`;
+      Array.from(brands).sort().forEach(b => {
+        bHtml += `<button class="chip" data-val="${b}" onclick="kfSelect('brand', '${b}')">${b}</button>`;
+      });
+      document.getElementById('kf-brand').innerHTML = bHtml;
+
+      let cHtml = `<button class="chip active" data-val="all" onclick="kfSelect('category', 'all')">Semua</button>`;
+      Array.from(cats).sort().forEach(c => {
+        cHtml += `<button class="chip" data-val="${c}" onclick="kfSelect('category', '${c}')">${c}</button>`;
+      });
+      document.getElementById('kf-category').innerHTML = cHtml;
+    }
+
+    function openKatalogFilterModal() {
+      document.getElementById('katalog-filter-modal').classList.add('show');
+    }
+    
+    function closeKatalogFilterModal() {
+      document.getElementById('katalog-filter-modal').classList.remove('show');
+      renderPriceCheckerList();
+    }
+    
+    function kfSelect(type, val) {
+      if(type === 'price') currentPcPriceFilter = val;
+      if(type === 'brand') currentPcBrandFilter = val;
+      if(type === 'category') currentPcCategoryFilter = val;
+      
+      document.querySelectorAll(`#kf-${type} .chip`).forEach(c => {
+        if(c.dataset.val === val) c.classList.add('active');
         else c.classList.remove('active');
       });
-      renderPriceCheckerList();
+      // Do not re-render yet until 'Terapkan' is clicked, just update UI
+    }
+
+    function kfReset() {
+      kfSelect('price', 'all');
+      kfSelect('brand', 'all');
+      kfSelect('category', 'all');
     }
 
     function renderPriceCheckerList() {
@@ -4402,6 +4476,16 @@
           if (currentPcPriceFilter === 'above10') return p.price > 10000000;
           return true;
         });
+      }
+
+      // Apply brand filter
+      if (currentPcBrandFilter !== 'all') {
+        filtered = filtered.filter(p => p.brand === currentPcBrandFilter);
+      }
+      
+      // Apply category filter
+      if (currentPcCategoryFilter !== 'all') {
+        filtered = filtered.filter(p => p.category === currentPcCategoryFilter);
       }
 
       // Apply text search
