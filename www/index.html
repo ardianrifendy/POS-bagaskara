@@ -1058,9 +1058,10 @@
       margin: 0 auto 60px;
     }
     .preview-box * {
-      letter-spacing: normal !important; /* Hindari bug tumpang tindih huruf di html2canvas */
-      word-spacing: normal !important;
+      letter-spacing: 0 !important; /* Hindari bug tumpang tindih huruf di html2canvas */
+      word-spacing: 0 !important;
       font-family: Arial, Helvetica, sans-serif !important;
+      text-rendering: geometricPrecision !important;
     }
     .inv-header {
       background: #1a1a1a;
@@ -2667,17 +2668,17 @@
         <div class="meta-box">
           <div class="meta-lbl">Detail Invoice</div>
           <div class="meta-val">
-            <strong>No. Invoice:</strong> <span id="prv-inv-no">-</span><br>
-            <strong>Tanggal:</strong> <span id="prv-inv-date">-</span><br>
-            <strong>Pembayaran:</strong> <span id="prv-payment">-</span>
+            <strong>No. Invoice:&nbsp;</strong><span id="prv-inv-no">-</span><br>
+            <strong>Tanggal:&nbsp;</strong><span id="prv-inv-date">-</span><br>
+            <strong>Pembayaran:&nbsp;</strong><span id="prv-payment">-</span>
           </div>
         </div>
         <div class="meta-box">
           <div class="meta-lbl">Detail Pembeli</div>
           <div class="meta-val">
-            <strong>Nama:</strong> <span id="prv-cust-name">-</span><br>
-            <strong>No. HP:</strong> <span id="prv-cust-phone">-</span><br>
-            <strong>Alamat:</strong> <span id="prv-cust-address">-</span>
+            <strong>Nama:&nbsp;</strong><span id="prv-cust-name">-</span><br>
+            <strong>No. HP:&nbsp;</strong><span id="prv-cust-phone">-</span><br>
+            <strong>Alamat:&nbsp;</strong><span id="prv-cust-address">-</span>
           </div>
         </div>
       </div>
