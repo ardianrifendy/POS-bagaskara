@@ -5033,19 +5033,28 @@
 
       const original = document.getElementById('print-area');
 
-      // Clone dan letakkan off-screen dengan position:fixed left:-99999px
-      // PENTING: Gunakan left jauh ke kiri, BUKAN z-index negatif
-      // z-index negatif menyebabkan html2canvas tidak merender → PDF kosong
-      const clone = original.cloneNode(true);
-      clone.style.cssText = `
+      // PENTING: left: -99999px menyebabkan blank putih pada html2canvas di Android
+      // Gunakan wrapper div dengan z-index negatif agar tidak terlihat di UI
+      // Tapi elemen clone tetap memiliki positioning normal agar ter-render sempurna
+      const wrapper = document.createElement('div');
+      wrapper.style.cssText = `
         position: fixed;
-        left: -99999px;
         top: 0;
-        width: ${original.offsetWidth || 600}px;
-        background: #fff;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        z-index: -9999;
+        overflow: hidden;
         pointer-events: none;
       `;
-      document.body.appendChild(clone);
+      
+      const clone = original.cloneNode(true);
+      clone.style.width = `${original.offsetWidth || 600}px`;
+      clone.style.background = '#ffffff';
+      clone.style.margin = '0';
+      
+      wrapper.appendChild(clone);
+      document.body.appendChild(wrapper);
 
       // Tunggu semua gambar (logo, tanda tangan) selesai dimuat
       const images = clone.querySelectorAll('img');
@@ -5076,7 +5085,7 @@
         };
 
         html2pdf().set(opt).from(clone).outputPdf('blob').then(async function(pdfBlob) {
-          document.body.removeChild(clone);
+          document.body.removeChild(wrapper);
           btn.disabled = false;
           btn.innerHTML = originalText;
 
