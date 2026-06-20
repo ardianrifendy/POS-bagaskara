@@ -181,6 +181,13 @@
       outline: none;
       color-scheme: dark;
       font-family: 'Outfit', sans-serif;
+      -webkit-appearance: none;
+      appearance: none;
+      background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 12px center;
+      background-size: 14px;
+      padding-right: 32px;
     }
     .profit-grid {
       display: grid;
@@ -203,6 +210,10 @@
     .profit-val.gn { color: #4ade80; }
     .profit-val.rd { color: #f87171; }
     .profit-val.or { color: var(--or); }
+    .mini-stat-val { font-size: 15px; font-weight: 800; }
+    .mini-stat-val.or { color: var(--or); }
+    .mini-stat-val.rd { color: #f87171; }
+    .mini-stat-val.gn { color: #4ade80; }
     .expense-card {
       background: var(--bk2);
       border: 1px solid rgba(255,255,255,0.05);
@@ -1792,13 +1803,31 @@
     body.light-theme .btn-print,
     body.light-theme .btn-close-prv,
     body.light-theme .btn-icon,
-    body.light-theme .spec-item,
-    body.light-theme .period-selector select {
+    body.light-theme .spec-item {
       background: var(--bk3) !important;
       color: var(--white) !important;
       border-color: rgba(0, 0, 0, 0.1) !important;
-      color-scheme: light !important;
     }
+    body.light-theme .period-selector select {
+      background-color: var(--bk3) !important;
+      color: var(--white) !important;
+      border-color: rgba(0, 0, 0, 0.1) !important;
+      color-scheme: light !important;
+      background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23111827' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E") !important;
+    }
+    body.light-theme .profit-card,
+    body.light-theme .expense-card {
+      background: var(--bk2);
+      border-color: rgba(0, 0, 0, 0.08);
+    }
+    body.light-theme .profit-card.highlight-gn { border-color: rgba(22,163,74,0.4); background: rgba(22,163,74,0.06); }
+    body.light-theme .profit-card.highlight-rd { border-color: rgba(220,38,38,0.3); background: rgba(220,38,38,0.05); }
+    body.light-theme .profit-card.highlight-or { border-color: rgba(217,119,6,0.3); background: rgba(217,119,6,0.05); }
+    body.light-theme .profit-val { color: var(--white); }
+    body.light-theme .profit-val.gn, body.light-theme .mini-stat-val.gn { color: #16a34a !important; }
+    body.light-theme .profit-val.rd, body.light-theme .expense-amt, body.light-theme .mini-stat-val.rd { color: #dc2626 !important; }
+    body.light-theme .profit-val.or, body.light-theme .mini-stat-val.or { color: #d97706 !important; }
+    body.light-theme .expense-cat { color: var(--white); }
     body.light-theme .stat-val,
     body.light-theme .card-title,
     body.light-theme .step-title,
@@ -2021,15 +2050,15 @@
           </div>
           <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:8px; margin-top:4px;">
             <div style="background:var(--bk3); border-radius:10px; padding:10px; text-align:center;">
-              <div style="font-size:15px; font-weight:800; color:var(--or);" id="lp-count-inv">0</div>
+              <div class="mini-stat-val or" id="lp-count-inv">0</div>
               <div style="font-size:9.5px; color:var(--gy); margin-top:2px;">Invoice</div>
             </div>
             <div style="background:var(--bk3); border-radius:10px; padding:10px; text-align:center;">
-              <div style="font-size:15px; font-weight:800; color:var(--or);" id="lp-count-unit">0</div>
+              <div class="mini-stat-val or" id="lp-count-unit">0</div>
               <div style="font-size:9.5px; color:var(--gy); margin-top:2px;">Unit Terjual</div>
             </div>
             <div style="background:var(--bk3); border-radius:10px; padding:10px; text-align:center;">
-              <div style="font-size:15px; font-weight:800; color:#f87171;" id="lp-count-piutang">0</div>
+              <div class="mini-stat-val rd" id="lp-count-piutang">0</div>
               <div style="font-size:9.5px; color:var(--gy); margin-top:2px;">Piutang Baru</div>
             </div>
           </div>
