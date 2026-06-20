@@ -1878,7 +1878,12 @@
         <div class="tb-date" id="tb-date"></div>
       </div>
     </div>
-    <div class="tb-clock" id="tb-clock"></div>
+    <div style="display:flex; align-items:center; gap:12px;">
+      <div onclick="openPriceChecker()" style="width: 32px; height: 32px; border-radius: 50%; background: rgba(255,255,255,0.08); display: flex; align-items: center; justify-content: center; cursor: pointer; color: #fff;">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+      </div>
+      <div class="tb-clock" id="tb-clock"></div>
+    </div>
   </div>
 
   <!-- MAIN TAB WRAPPERS -->
@@ -2924,6 +2929,19 @@
         <button class="btn-secondary" onclick="closeCicilanModal()" style="flex:1;">Batal</button>
         <button class="btn-primary" onclick="saveCicilan()" style="flex:2;">Simpan Cicilan</button>
       </div>
+    </div>
+  </div>
+
+  <!-- PRICE CHECKER MODAL -->
+  <div id="price-checker-modal" class="settings-subpage-overlay" style="display:none; z-index:999;">
+    <div class="subpage-header">
+      <button class="btn-back" onclick="closePriceChecker()"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg></button>
+      <div class="subpage-title" style="flex:1;" id="lbl-cek-harga-title">Cek Harga Katalog</div>
+    </div>
+    <div style="padding:16px;">
+      <input type="text" id="pc-search-input" placeholder="Ketik merek atau tipe HP..." oninput="renderPriceCheckerList()" style="width:100%; padding: 14px 16px; border-radius:12px; background:var(--bk3); border:1px solid rgba(255,255,255,0.08); color:#fff; outline:none; font-size:14px; margin-bottom:16px;">
+      
+      <div id="pc-results-list" style="display:flex; flex-direction:column; gap:10px; max-height:calc(100vh - 160px); overflow-y:auto; padding-bottom:20px;"></div>
     </div>
   </div>
 
@@ -4315,7 +4333,9 @@
       filtered.forEach(p => {
         const item = document.createElement('div');
         item.className = 'suggestion-item';
-        item.textContent = p.model;
+        let txt = p.model;
+        if (p.price) txt += ` - Rp ${p.price.toLocaleString('id-ID')}`;
+        item.textContent = txt;
         item.onclick = () => {
           document.getElementById('prod-model').value = p.model;
           if (!brand) {
@@ -4323,11 +4343,69 @@
           }
           if (p.ram) document.getElementById('prod-ram').value = p.ram;
           if (p.storage) document.getElementById('prod-storage').value = p.storage;
+          if (p.price) document.getElementById('prod-price-sell').value = p.price;
           list.style.display = 'none';
         };
         list.appendChild(item);
       });
       list.style.display = 'block';
+    }
+
+    // PRICE CHECKER LOGIC
+    function openPriceChecker() {
+      document.getElementById('price-checker-modal').style.display = 'flex';
+      const inp = document.getElementById('pc-search-input');
+      inp.value = '';
+      renderPriceCheckerList();
+      setTimeout(() => inp.focus(), 100);
+    }
+    
+    function closePriceChecker() {
+      document.getElementById('price-checker-modal').style.display = 'none';
+    }
+
+    function renderPriceCheckerList() {
+      const list = document.getElementById('pc-results-list');
+      list.innerHTML = '';
+      const val = document.getElementById('pc-search-input').value.toLowerCase().trim();
+      
+      let filtered = phoneCatalog;
+      if (val) {
+        filtered = filtered.filter(x => x.model.toLowerCase().includes(val) || x.brand.toLowerCase().includes(val));
+      } else {
+        filtered = filtered.slice(0, 30); // show top 30 initially
+      }
+
+      if (filtered.length === 0) {
+        list.innerHTML = `<div style="text-align:center; padding: 20px; color: var(--gy); font-size: 13px;">Tidak ada hasil ditemukan.</div>`;
+        return;
+      }
+
+      filtered.forEach(p => {
+        const card = document.createElement('div');
+        card.style.background = 'var(--bk3)';
+        card.style.padding = '14px';
+        card.style.borderRadius = '12px';
+        card.style.display = 'flex';
+        card.style.justifyContent = 'space-between';
+        card.style.alignItems = 'center';
+        
+        let priceStr = '-';
+        if (p.price) priceStr = `Rp ${p.price.toLocaleString('id-ID')}`;
+
+        card.innerHTML = `
+          <div>
+            <div style="font-size:12px; color:var(--gy); font-weight:600;">${p.brand}</div>
+            <div style="font-size:15px; color:#fff; font-weight:700; margin-top:2px;">${p.model}</div>
+            <div style="font-size:11px; color:var(--gy); margin-top:4px;">${p.ram ? p.ram + ' / ' : ''}${p.storage || ''}</div>
+          </div>
+          <div style="text-align:right;">
+            <div style="font-size:10px; color:var(--gy); margin-bottom:2px;">Harga Acuan</div>
+            <div style="font-size:15px; font-weight:800; color:var(--or);">${priceStr}</div>
+          </div>
+        `;
+        list.appendChild(card);
+      });
     }
 
     function openOcrForProduct() {
@@ -5373,12 +5451,13 @@
         return;
       }
 
-      const headers = ['Merek', 'Tipe', 'RAM', 'Storage'];
+      const headers = ['Merek', 'Tipe', 'RAM', 'Storage', 'Harga'];
       const rows = phoneCatalog.map(p => [
         p.brand,
         p.model,
         p.ram || '',
-        p.storage || ''
+        p.storage || '',
+        p.price || ''
       ]);
 
       let csvContent = headers.join(',') + '\n' + rows.map(r => r.map(val => {
@@ -5425,12 +5504,15 @@
 
           const ram = cols[2] ? cols[2].trim() : '';
           const storage = cols[3] ? cols[3].trim() : '';
+          const priceStr = cols[4] ? cols[4].replace(/\D/g, '') : '';
+          const price = priceStr ? parseInt(priceStr) : 0;
 
           newCatalog.push({
             brand,
             model,
             ram,
-            storage
+            storage,
+            price
           });
         }
 
@@ -6170,6 +6252,7 @@
         "Edit teks garansi & catatan footer untuk tipe nota berbeda": "Edit warranty text & footer notes for different invoice types",
         "Ekspor Laporan (CSV)": "Export Report (CSV)", "Ekspor Semua Transaksi (CSV)": "Export All Transactions (CSV)",
         "Kelola saran otomatis merek & tipe HP (ekspor/impor CSV)": "Manage brand & model autocomplete (export/import CSV)",
+        "Cek Harga Katalog": "Price Checker Catalog", "Ketik merek atau tipe HP...": "Type brand or phone model...",
         "Nama, alamat, WhatsApp, Instagram, & folder simpan PDF": "Name, address, WhatsApp, Instagram, & PDF folder",
         "Pilih bahasa (Indonesian / English)": "Select language (Indonesian / English)",
         "Gelap / Terang (Dark / Light Mode)": "Dark / Light Mode",
@@ -6222,6 +6305,7 @@
         "Edit teks garansi & catatan footer untuk tipe nota berbeda": "Edit teks garansi & catatan footer untuk tipe nota berbeda",
         "Ekspor Laporan (CSV)": "Ekspor Laporan (CSV)", "Ekspor Semua Transaksi (CSV)": "Ekspor Semua Transaksi (CSV)",
         "Kelola saran otomatis merek & tipe HP (ekspor/impor CSV)": "Kelola saran otomatis merek & tipe HP (ekspor/impor CSV)",
+        "Cek Harga Katalog": "Cek Harga Katalog", "Ketik merek atau tipe HP...": "Ketik merek atau tipe HP...",
         "Nama, alamat, WhatsApp, Instagram, & folder simpan PDF": "Nama, alamat, WhatsApp, Instagram, & folder simpan PDF",
         "Pilih bahasa (Indonesian / English)": "Pilih bahasa (Indonesian / English)",
         "Gelap / Terang (Dark / Light Mode)": "Gelap / Terang (Dark / Light Mode)",
