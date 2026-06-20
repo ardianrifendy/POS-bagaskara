@@ -108,21 +108,27 @@
     .tb-date {
       font-size: 10.5px;
       color: var(--gy);
-      font-weight: 500;
-      margin-top: 1px;
-    }
     .tb-clock {
-      font-size: 13.5px;
+      text-align: right;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      font-variant-numeric: tabular-nums;
+    }
+    .tb-clock .time {
+      font-size: 15px;
       font-weight: 700;
       color: var(--or);
-      background: rgba(247, 147, 26, 0.12);
-      padding: 6px 12px;
-      border-radius: 10px;
+      letter-spacing: 1px;
+      line-height: 1;
+    }
+    .tb-clock .zone {
+      font-size: 10px;
+      font-weight: 600;
+      color: var(--gy);
+      margin-top: 3px;
       letter-spacing: 0.5px;
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      font-variant-numeric: tabular-nums;
+      line-height: 1;
     }
 
     /* BOTTOM NAV BAR */
@@ -6386,8 +6392,7 @@
       const now = new Date();
       const hrs = String(now.getHours()).padStart(2, '0');
       const mins = String(now.getMinutes()).padStart(2, '0');
-      const secs = String(now.getSeconds()).padStart(2, '0');
-      clockEl.innerHTML = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="opacity:0.8;"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> <span>${hrs}:${mins}</span><span style="opacity: 0.5; font-size: 11px;">:${secs}</span>`;
+      clockEl.innerHTML = `<div class="time">${hrs}:${mins}</div><div class="zone">WIB</div>`;
     }
 
     let currentZoom = parseFloat(localStorage.getItem('bagaskara_zoom')) || 1.0;
