@@ -2293,6 +2293,13 @@
       </div>
     </div>
 
+    <!-- TAB 5: KATALOG / CEK HARGA -->
+    <div id="tab-katalog" class="tab-content" style="padding:16px;">
+      <h2 style="margin-top:0; margin-bottom:16px; font-size:20px;">Cek Harga Katalog</h2>
+      <input type="text" id="pc-search-input" placeholder="Ketik merek atau tipe HP..." oninput="renderPriceCheckerList()" style="width:100%; padding: 14px 16px; border-radius:12px; background:var(--bk3); border:1px solid rgba(255,255,255,0.08); color:#fff; outline:none; font-size:14px; margin-bottom:16px;">
+      <div id="pc-results-list" style="display:flex; flex-direction:column; gap:10px;"></div>
+    </div>
+
     <!-- TAB 4: PENGATURAN / SETTINGS -->
     <div id="tab-settings" class="tab-content">
       <!-- Profile Card (WA Style) -->
@@ -2466,6 +2473,12 @@
         </svg>
       </div>
       <span>Produk</span>
+    </div>
+    <div class="nav-item" onclick="switchTab('katalog')" id="nav-katalog">
+      <div class="nav-icon-wrapper">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+      </div>
+      <span>Katalog</span>
     </div>
     <div class="nav-item" onclick="switchTab('settings')" id="nav-settings">
       <div class="nav-icon-wrapper">
@@ -2933,19 +2946,6 @@
     </div>
   </div>
 
-  <!-- PRICE CHECKER MODAL -->
-  <div id="price-checker-modal" class="settings-subpage-overlay" style="display:none; z-index:999;">
-    <div class="subpage-header">
-      <button class="btn-back" onclick="closePriceChecker()"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg></button>
-      <div class="subpage-title" style="flex:1;" id="lbl-cek-harga-title">Cek Harga Katalog</div>
-    </div>
-    <div style="padding:16px;">
-      <input type="text" id="pc-search-input" placeholder="Ketik merek atau tipe HP..." oninput="renderPriceCheckerList()" style="width:100%; padding: 14px 16px; border-radius:12px; background:var(--bk3); border:1px solid rgba(255,255,255,0.08); color:#fff; outline:none; font-size:14px; margin-bottom:16px;">
-      
-      <div id="pc-results-list" style="display:flex; flex-direction:column; gap:10px; max-height:calc(100vh - 160px); overflow-y:auto; padding-bottom:20px;"></div>
-    </div>
-  </div>
-
   <!-- EXPENSE ADD/EDIT MODAL -->
   <div class="cicilan-overlay" id="expense-modal" onclick="if(event.target===this)closeExpenseModal()">
     <div class="cicilan-sheet">
@@ -3158,6 +3158,9 @@
         renderProductList();
       } else if (tabId === 'settings') {
         updateBackupSummary();
+      } else if (tabId === 'katalog') {
+        const inp = document.getElementById('pc-search-input');
+        if (inp.value === '') renderPriceCheckerList();
       }
       
       // Auto-scroll to top
@@ -4353,18 +4356,6 @@
     }
 
     // PRICE CHECKER LOGIC
-    function openPriceChecker() {
-      document.getElementById('price-checker-modal').style.display = 'flex';
-      const inp = document.getElementById('pc-search-input');
-      inp.value = '';
-      renderPriceCheckerList();
-      setTimeout(() => inp.focus(), 100);
-    }
-    
-    function closePriceChecker() {
-      document.getElementById('price-checker-modal').style.display = 'none';
-    }
-
     function renderPriceCheckerList() {
       const list = document.getElementById('pc-results-list');
       list.innerHTML = '';
