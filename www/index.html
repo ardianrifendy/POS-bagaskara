@@ -5056,7 +5056,10 @@
       `;
       
       const clone = original.cloneNode(true);
-      clone.style.width = `${original.offsetWidth || 600}px`;
+      // PENTING: Gunakan ukuran lebar statis (800px) agar tata letak PDF selalu rapi
+      // dan tidak "tergencet" walau digenerate dari layar HP yang sempit.
+      clone.style.width = `800px`;
+      clone.style.maxWidth = `800px`;
       clone.style.background = '#ffffff';
       clone.style.margin = '0';
       
@@ -5086,7 +5089,7 @@
             scrollX: 0,
             scrollY: 0,
             backgroundColor: '#ffffff',
-            windowWidth: original.offsetWidth || 600
+            windowWidth: 800
           },
           jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
         };
