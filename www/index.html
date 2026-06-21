@@ -2337,7 +2337,7 @@
         <div class="step-content" id="step1-content" style="display:none;">
           <div class="field">
             <label>No. Invoice (Otomatis)</label>
-            <input type="text" id="inp-inv-no" readonly>
+            <input type="text" id="inp-inv-no">
           </div>
           <div class="field">
             <label>Tanggal Transaksi</label>
@@ -3679,6 +3679,7 @@
         if (mm < 10) mm = '0' + mm;
         document.getElementById('inp-inv-date').value = yyyy + '-' + mm + '-' + dd;
         document.getElementById('date-display').textContent = formatDateDisplay(cdpSelectedDate);
+        generateInvoiceNumber();
       }
       closeDatePicker();
     }
@@ -3767,7 +3768,8 @@
 
     // DYNAMIC INVOICE NUMBER GENERATION
     function generateInvoiceNumber() {
-      const today = new Date();
+      const dateInput = document.getElementById('inp-inv-date').value;
+      const today = dateInput ? new Date(dateInput) : new Date();
       const yyyy = today.getFullYear();
       let mm = today.getMonth() + 1;
       let dd = today.getDate();
@@ -4132,6 +4134,7 @@
     }
 
     function resetInvoiceForm() {
+      setTodayDateInput();
       generateInvoiceNumber();
       document.getElementById('inp-cust-name').value = '';
       document.getElementById('inp-cust-phone').value = '';
