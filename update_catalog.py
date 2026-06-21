@@ -2,10 +2,10 @@ import csv
 import json
 import re
 
-csv_file = 'update database erafone.csv'
+csv_file = 'UPDATE BESAR.csv'
 js_file = 'www/phone-catalog.js'
 
-catalog = []
+catalog_dict = {}
 
 with open(csv_file, 'r', encoding='utf-8-sig') as f:
     reader = csv.DictReader(f)
@@ -19,7 +19,7 @@ with open(csv_file, 'r', encoding='utf-8-sig') as f:
         if not kategori:
             kategori = row.get('Kategori', '').strip()
             
-        harga_normal = row.get('Harga', '').strip()
+        harga_normal = row.get('Harga_Normal', row.get('Harga', '')).strip()
         harga_promo = row.get('Harga_Promo', '').strip()
         
         # Determine price
@@ -32,42 +32,45 @@ with open(csv_file, 'r', encoding='utf-8-sig') as f:
         if price == 0:
             continue
             
-        # Try to extract RAM and Storage
-        ram = ""
-        storage = ""
+        warna = row.get('Warna', '').strip()
         kapasitas = row.get('Kapasitas', '').strip()
+        stok_str = row.get('Stok_Qty', '0').strip()
+        stok = int(stok_str) if stok_str.isdigit() else 0
+        status_stok = row.get('Status_Stok', '').strip()
+        varian_name = row.get('Varian', '').strip()
+        image = row.get('Link_Gambar', '').strip()
         
-        # If empty, try to extract from Nama
-        target_str = kapasitas if kapasitas else nama
-        
-        # Regex to find RAM/ROM like 8/256GB or 12GB/512GB
-        match = re.search(r'(\d+)\s*(?:GB|TB)?\s*/\s*(\d+)\s*(GB|TB)', target_str, re.IGNORECASE)
-        if match:
-            ram = match.group(1) + "GB"
-            storage = match.group(2) + match.group(3).upper()
-        else:
-            # Maybe just "256GB" without RAM
-            match2 = re.search(r'(?<!/)\b(\d+)\s*(GB|TB)\b', target_str, re.IGNORECASE)
-            if match2:
-                storage = match2.group(1) + match2.group(2).upper()
-                
-        catalog.append({
-            "brand": brand,
-            "model": nama,
-            "category": kategori,
-            "ram": ram,
-            "storage": storage,
+        # Initialize base model if not exists
+        if nama not in catalog_dict:
+            catalog_dict[nama] = {
+                "brand": brand,
+                "model": nama,
+                "category": kategori,
+                "image": image,
+                "variants": []
+            }
+            
+        # Append variant
+        catalog_dict[nama]["variants"].append({
+            "color": warna,
+            "capacity": kapasitas,
+            "variant_name": varian_name,
             "price": price,
-            "image": row.get('Link_Gambar', '')
+            "stock": stok,
+            "status": status_stok
         })
 
-# Deduplicate by model name
-seen = set()
+# Process min/max prices and sort
 unique_catalog = []
-for item in catalog:
-    if item['model'] not in seen:
-        seen.add(item['model'])
-        unique_catalog.append(item)
+for model_name, data in catalog_dict.items():
+    prices = [v["price"] for v in data["variants"]]
+    data["price_min"] = min(prices) if prices else 0
+    data["price_max"] = max(prices) if prices else 0
+    
+    # Sort variants by capacity then color
+    data["variants"].sort(key=lambda x: (x["capacity"], x["color"]))
+    
+    unique_catalog.append(data)
 
 # Sort by brand then model
 unique_catalog.sort(key=lambda x: (x['brand'], x['model']))
@@ -77,4 +80,4 @@ js_content = 'window.ERAFONE_CATALOG = {"catalog": ' + json.dumps(unique_catalog
 with open(js_file, 'w', encoding='utf-8') as f:
     f.write(js_content)
 
-print(f"Successfully generated {js_file} with {len(unique_catalog)} products.")
+print(f"Successfully generated {js_file} with {len(unique_catalog)} base models.")
