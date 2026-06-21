@@ -7461,6 +7461,7 @@
       let currentVal = '';
 
       if (type === 'history') {
+        chipsContainer.style.display = 'flex';
         title.textContent = 'Filter Status Pembayaran';
         currentVal = currentHistoryStatusFilter;
         options = [
@@ -7471,6 +7472,7 @@
           { val: 'belum_lunas', label: 'Semua Piutang' }
         ];
       } else if (type === 'product') {
+        chipsContainer.style.display = 'block';
         title.textContent = 'Filter Produk & Stok';
         chipsContainer.innerHTML = '';
         
@@ -7532,6 +7534,7 @@
         modal.classList.add('show');
         return;
       } else if (type === 'inv') {
+        chipsContainer.style.display = 'flex';
         title.textContent = 'Filter Merek Inventori';
         currentVal = currentInventorySelectBrandFilter;
         options = [
