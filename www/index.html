@@ -5182,8 +5182,6 @@
       document.getElementById('stat-inventory-qty').innerText = `${totalStokCount} Unit`;
       document.getElementById('stat-inventory-value').innerText = `Rp ${totalInventoryValue.toLocaleString('id-ID')}`;
       document.getElementById('stat-total-db').innerHTML = `${database.length} <span style="font-size:12px; font-weight:400; color:var(--gy)">Invoice Terdaftar</span>`;
-      document.getElementById('stat-piutang-total').innerText = `Rp ${totalPiutang.toLocaleString('id-ID')}`;
-      document.getElementById('stat-piutang-count').innerHTML = `${uniqueDebtors} <span style="font-size:12px; font-weight:400; color:var(--gy)">Orang</span>`;
 
       // Show/hide piutang card on dashboard
       const piutangCard = document.getElementById('piutang-dashboard-card');
