@@ -4389,6 +4389,7 @@
     // PRODUCT DATABASE & AUTOCOMPLETE SEARCH LOGIC
     let products = [];
     let currentProductBrandFilter = 'All';
+    let currentProductStatusFilter = 'all';
     let phoneCatalog = [];
 
     function loadProducts() {
@@ -4484,6 +4485,10 @@
       const filtered = products.filter(p => {
         // Brand filter
         if (currentProductBrandFilter !== 'All' && p.brand !== currentProductBrandFilter) return false;
+        
+        // Status filter
+        if (currentProductStatusFilter === 'terjual' && p.status !== 'Terjual') return false;
+        if (currentProductStatusFilter === 'belum_terjual' && p.status === 'Terjual') return false;
         
         // Search query
         const inBrand = p.brand.toLowerCase().includes(query);
@@ -7466,12 +7471,66 @@
           { val: 'belum_lunas', label: 'Semua Piutang' }
         ];
       } else if (type === 'product') {
-        title.textContent = 'Filter Merek Produk';
-        currentVal = currentProductBrandFilter;
+        title.textContent = 'Filter Produk & Stok';
+        chipsContainer.innerHTML = '';
+        
+        // STATUS SECTION
+        const statusLbl = document.createElement('div');
+        statusLbl.style = 'font-size:12px; color:var(--gy); margin-bottom:8px; font-weight:700;';
+        statusLbl.textContent = 'STATUS STOK';
+        chipsContainer.appendChild(statusLbl);
+        
+        const statusDiv = document.createElement('div');
+        statusDiv.style = 'display:flex; flex-wrap:wrap; gap:8px; margin-bottom:20px;';
+        const statuses = [
+          { val: 'all', label: 'Semua Status' },
+          { val: 'belum_terjual', label: 'Tersedia' },
+          { val: 'terjual', label: 'Terjual' }
+        ];
+        statuses.forEach(opt => {
+          const btn = document.createElement('button');
+          btn.className = `chip ${currentProductStatusFilter === opt.val ? 'active' : ''}`;
+          btn.textContent = opt.label;
+          btn.onclick = () => {
+             currentProductStatusFilter = opt.val;
+             renderProductList();
+             Array.from(statusDiv.children).forEach(c => c.classList.remove('active'));
+             btn.classList.add('active');
+          };
+          statusDiv.appendChild(btn);
+        });
+        chipsContainer.appendChild(statusDiv);
+
+        // BRAND SECTION
+        const brandLbl = document.createElement('div');
+        brandLbl.style = 'font-size:12px; color:var(--gy); margin-bottom:8px; font-weight:700;';
+        brandLbl.textContent = 'MEREK PRODUK';
+        chipsContainer.appendChild(brandLbl);
+
+        const brandDiv = document.createElement('div');
+        brandDiv.style = 'display:flex; flex-wrap:wrap; gap:8px; margin-bottom:20px;';
+        
         const uniqueBrands = new Set(products.map(p => p.brand).filter(b => b));
         const sortedBrands = Array.from(uniqueBrands).sort();
-        options = [{ val: 'All', label: 'Semua Brand' }];
-        sortedBrands.forEach(b => options.push({ val: b, label: b }));
+        const brandOpts = [{ val: 'All', label: 'Semua Brand' }];
+        sortedBrands.forEach(b => brandOpts.push({ val: b, label: b }));
+
+        brandOpts.forEach(opt => {
+          const btn = document.createElement('button');
+          btn.className = `chip ${currentProductBrandFilter === opt.val ? 'active' : ''}`;
+          btn.textContent = opt.label;
+          btn.onclick = () => {
+             currentProductBrandFilter = opt.val;
+             renderProductList();
+             Array.from(brandDiv.children).forEach(c => c.classList.remove('active'));
+             btn.classList.add('active');
+          };
+          brandDiv.appendChild(btn);
+        });
+        chipsContainer.appendChild(brandDiv);
+
+        modal.classList.add('show');
+        return;
       } else if (type === 'inv') {
         title.textContent = 'Filter Merek Inventori';
         currentVal = currentInventorySelectBrandFilter;
