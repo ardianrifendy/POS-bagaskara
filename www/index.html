@@ -3780,24 +3780,30 @@
       if (mm < 10) mm = '0' + mm;
       
       const dateString = `${yyyy}${mm}${dd}`;
+      const prefix = `INV/${dateString}/`;
       
-      // Get last processed date
-      const lastDate = localStorage.getItem('bagaskara_last_date');
-      let seq = 1;
-      
-      if (lastDate === dateString) {
-        // Same day, read current index
-        const currentCounter = parseInt(localStorage.getItem('bagaskara_counter')) || 0;
-        seq = currentCounter + 1;
-      } else {
-        // New day or first time, reset index to 1
-        localStorage.setItem('bagaskara_last_date', dateString);
+      let maxSeq = 0;
+      if (database && database.length > 0) {
+        database.forEach(inv => {
+          if (inv.invNo && inv.invNo.startsWith(prefix)) {
+            const parts = inv.invNo.split('/');
+            if (parts.length === 3) {
+              const num = parseInt(parts[2], 10);
+              if (!isNaN(num) && num > maxSeq) {
+                maxSeq = num;
+              }
+            }
+          }
+        });
       }
       
+      let seq = maxSeq + 1;
+      
+      localStorage.setItem('bagaskara_last_date', dateString);
       localStorage.setItem('bagaskara_counter', seq);
       
       const seqPad = String(seq).padStart(3, '0');
-      const finalInvoiceNumber = `INV/${dateString}/${seqPad}`;
+      const finalInvoiceNumber = `${prefix}${seqPad}`;
       
       document.getElementById('inp-inv-no').value = finalInvoiceNumber;
     }
