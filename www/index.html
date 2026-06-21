@@ -275,6 +275,36 @@
       z-index: 500;
       box-shadow: 0 8px 32px rgba(0,0,0,0.5);
     }
+
+    .fab-invoice {
+      position: fixed;
+      bottom: 90px;
+      right: 20px;
+      width: 56px;
+      height: 56px;
+      background: var(--gn);
+      color: #111;
+      border-radius: 16px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      box-shadow: 0 6px 20px rgba(34, 197, 94, 0.4);
+      z-index: 400;
+      cursor: pointer;
+      transition: transform 0.2s, background 0.2s;
+    }
+    .fab-invoice:active {
+      transform: scale(0.92);
+      background: #1da44d;
+    }
+    body[data-theme*="light"] .fab-invoice {
+      box-shadow: 0 6px 20px rgba(34, 197, 94, 0.5);
+      color: #fff;
+    }
+    .fab-invoice svg {
+      width: 26px;
+      height: 26px;
+    }
     .nav-item {
       display: flex;
       flex-direction: column;
@@ -2181,17 +2211,6 @@
 
       <!-- VIEW A: RINGKASAN HARIAN -->
       <div id="dash-view-ringkasan">
-<div class="card">
-          <div class="card-title">Pintasan Cepat</div>
-          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
-            <button class="btn-primary" onclick="switchTab('form'); resetInvoiceForm();" style="padding: 12px; font-size:12.5px;">
-              ➕ Buat Invoice Baru
-            </button>
-            <button class="btn-secondary" onclick="switchTab('history')" style="padding: 12px; font-size:12.5px;">
-              📄 Riwayat Transaksi
-            </button>
-          </div>
-        </div>
 
 
         <div class="stats-grid">
@@ -2859,6 +2878,14 @@
 
     </div>
 
+  <!-- FAB INVOICE -->
+  <div class="fab-invoice" id="fab-invoice" onclick="switchTab('form'); resetInvoiceForm();">
+    <svg viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="1.5">
+      <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+      <line x1="9" y1="10" x2="15" y2="10" stroke="#22c55e" stroke-width="2.5" stroke-linecap="round"></line>
+      <line x1="12" y1="7" x2="12" y2="13" stroke="#22c55e" stroke-width="2.5" stroke-linecap="round"></line>
+    </svg>
+  </div>
   <div class="bottom-nav">
     <div class="nav-item active" onclick="switchTab('dashboard')" id="nav-dashboard">
       <div class="nav-icon-wrapper">
@@ -3532,6 +3559,11 @@
     const tabOrder = { 'dashboard': 0, 'history': 1, 'form': 2, 'products': 3, 'katalog': 4, 'settings': 5 };
 
     function switchTab(tabId) {
+      const fab = document.getElementById('fab-invoice');
+      if (fab) {
+        if (tabId === 'form') fab.style.display = 'none';
+        else fab.style.display = 'flex';
+      }
       const oldIndex = tabOrder[currentTab];
       const newIndex = tabOrder[tabId];
       let directionClass = 'slide-left';
