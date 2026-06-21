@@ -4543,13 +4543,10 @@
         let variantsHtml = '';
         if (p.variants && p.variants.length > 0) {
             p.variants.forEach(v => {
-                const stockColor = v.stock > 0 ? '#4caf50' : '#f44336';
-                const stockText = v.stock > 0 ? `Ready (${v.stock})` : 'Habis';
                 variantsHtml += `
                   <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px; font-size:13px; background:#222; padding:10px; border-radius:8px;">
                     <div>
                       <div style="color:#fff; font-weight:600;">${v.capacity} ${v.color ? ' - ' + v.color : ''}</div>
-                      <div style="font-size:11px; color:${stockColor}; margin-top:4px;">${stockText}</div>
                     </div>
                     <div style="color:var(--or); font-weight:bold; font-size:14px;">Rp ${v.price.toLocaleString('id-ID')}</div>
                   </div>
