@@ -5077,7 +5077,10 @@
       container.innerHTML = '';
 
       // Only display products that are "Tersedia"
-      const available = products.filter(p => p.status !== 'Terjual');
+      const available = products.filter(p => {
+        const s = (p.status || '').trim().toLowerCase();
+        return s !== 'terjual';
+      });
 
       const filtered = available.filter(p => {
         // Brand filter
