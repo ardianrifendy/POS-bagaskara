@@ -2534,15 +2534,20 @@
     </div>
     <!-- TAB 3: RIWAYAT / DATABASE -->
     <div id="tab-history" class="tab-content">
-      <div class="search-row">
-        <input type="text" id="history-search-input" placeholder="Cari nama pembeli, no invoice, IMEI..." oninput="renderHistoryList()">
-      </div>
-      <div class="filter-chips" id="history-filter-chips" style="display:flex; gap:8px; overflow-x:auto; padding-bottom:10px; margin-bottom:4px; -webkit-overflow-scrolling:touch; scrollbar-width:none;">
-        <div class="chip active" data-hstatus="all" onclick="filterHistoryStatus('all')">Semua</div>
-        <div class="chip" data-hstatus="lunas" onclick="filterHistoryStatus('lunas')">Lunas</div>
-        <div class="chip" data-hstatus="dp" onclick="filterHistoryStatus('dp')">DP</div>
-        <div class="chip" data-hstatus="belum_bayar" onclick="filterHistoryStatus('belum_bayar')">Belum Bayar</div>
-        <div class="chip" data-hstatus="belum_lunas" onclick="filterHistoryStatus('belum_lunas')">Semua Piutang</div>
+      <div style="display:flex; gap:10px; margin-bottom:16px;">
+        <div style="flex:1; position:relative;">
+          <input type="text" id="history-search-input" placeholder="Cari nama pembeli, no invoice, IMEI..." oninput="renderHistoryList()" style="width:100%; padding: 14px 16px; border-radius:12px; background:var(--bk3); border:1px solid rgba(255,255,255,0.08); color:#fff; outline:none; font-size:14px;">
+        </div>
+        <div style="position:relative; background:var(--bk3); border:1px solid rgba(255,255,255,0.08); border-radius:12px; display:flex; align-items:center; justify-content:center; width:52px; cursor:pointer;">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon></svg>
+          <select id="history-filter-select" onchange="filterHistoryStatus(this.value)" style="position:absolute; top:0; left:0; width:100%; height:100%; opacity:0; cursor:pointer; font-size:16px;">
+            <option value="all">Semua Status</option>
+            <option value="lunas">Lunas</option>
+            <option value="dp">DP</option>
+            <option value="belum_bayar">Belum Bayar</option>
+            <option value="belum_lunas">Semua Piutang</option>
+          </select>
+        </div>
       </div>
       <div class="history-list" id="full-history-feed">
         <!-- History invoices load here -->
@@ -2824,6 +2829,12 @@
     <div id="tab-products" class="tab-content">
       <div style="display: flex; gap: 10px; margin-bottom: 12px;">
         <input type="text" id="prod-search-input" placeholder="Cari tipe, merek, IMEI, kondisi..." oninput="renderProductList()" style="flex: 1; padding: 12px 14px; background: var(--bk3); border: 1px solid rgba(255,255,255,0.08); border-radius: 12px; color: #fff; font-size:13.5px; outline:none;">
+        <div style="position:relative; background:var(--bk3); border:1px solid rgba(255,255,255,0.08); border-radius:12px; display:flex; align-items:center; justify-content:center; width:52px; cursor:pointer;">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon></svg>
+          <select id="product-filter-select" onchange="filterProductBrand(this.value)" style="position:absolute; top:0; left:0; width:100%; height:100%; opacity:0; cursor:pointer; font-size:16px;">
+            <option value="All">Semua Brand</option>
+          </select>
+        </div>
         <button class="btn-primary" onclick="openProductModal()" style="width: auto; padding: 0 16px; height: 44px; display: flex; align-items: center; justify-content: center; gap: 6px; font-size: 13px; border-radius: 12px; margin: 0; box-shadow: none;">
           ➕ Tambah
         </button>
@@ -2838,10 +2849,6 @@
         <input type="file" id="product-import-file" accept=".csv" style="display: none;" onchange="importProductsFromCSV(event)">
       </div>
 
-      <!-- Brand Filter Chips -->
-      <div class="filter-chips" id="product-filter-chips" style="display: flex; gap: 8px; overflow-x: auto; padding-bottom: 10px; margin-bottom: 16px; -webkit-overflow-scrolling: touch;">
-        <div class="chip active" onclick="filterProductBrand('All')" data-brand="All">Semua</div>
-      </div>
 
       <div class="product-list" id="product-list-feed">
         <!-- Products list loads here -->
@@ -3354,20 +3361,24 @@
         <button onclick="closeInventorySelectModal()" style="background:none; border:none; color:var(--rd); font-weight:800; font-size:16px; cursor:pointer; padding:4px;">✕</button>
       </div>
       <div style="padding: 16px 20px 0 20px; display:flex; flex-direction:column; gap:12px;">
-        <div class="search-box">
-          <input type="text" id="inv-select-search" placeholder="Cari berdasarkan tipe, warna, IMEI..." oninput="renderInventorySelectList()">
-        </div>
-        
-        <div class="filter-chips" id="inv-select-chips" style="margin-top:0; padding-bottom:6px; overflow-x:auto; display:flex; gap:8px;">
-          <button class="chip active" data-brand="All" onclick="filterInventorySelectBrand('All')">Semua</button>
-          <button class="chip" data-brand="Samsung" onclick="filterInventorySelectBrand('Samsung')">Samsung</button>
-          <button class="chip" data-brand="Apple" onclick="filterInventorySelectBrand('Apple')">iPhone</button>
-          <button class="chip" data-brand="Xiaomi" onclick="filterInventorySelectBrand('Xiaomi')">Xiaomi</button>
-          <button class="chip" data-brand="OPPO" onclick="filterInventorySelectBrand('OPPO')">OPPO</button>
-          <button class="chip" data-brand="Vivo" onclick="filterInventorySelectBrand('Vivo')">Vivo</button>
-          <button class="chip" data-brand="Realme" onclick="filterInventorySelectBrand('Realme')">Realme</button>
-          <button class="chip" data-brand="Poco" onclick="filterInventorySelectBrand('Poco')">Poco</button>
-          <button class="chip" data-brand="iQOO" onclick="filterInventorySelectBrand('iQOO')">iQOO</button>
+        <div style="display:flex; gap:10px; margin-bottom:0;">
+          <div style="flex:1; position:relative;" class="search-box">
+            <input type="text" id="inv-select-search" placeholder="Cari berdasarkan tipe, warna, IMEI..." oninput="renderInventorySelectList()" style="width:100%;">
+          </div>
+          <div style="position:relative; background:var(--bk3); border:1px solid rgba(255,255,255,0.08); border-radius:12px; display:flex; align-items:center; justify-content:center; width:52px; cursor:pointer;">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon></svg>
+            <select id="inv-filter-select" onchange="filterInventorySelectBrand(this.value)" style="position:absolute; top:0; left:0; width:100%; height:100%; opacity:0; cursor:pointer; font-size:16px;">
+              <option value="All">Semua Brand</option>
+              <option value="Samsung">Samsung</option>
+              <option value="Apple">iPhone</option>
+              <option value="Xiaomi">Xiaomi</option>
+              <option value="OPPO">OPPO</option>
+              <option value="Vivo">Vivo</option>
+              <option value="Realme">Realme</option>
+              <option value="Poco">Poco</option>
+              <option value="iQOO">iQOO</option>
+            </select>
+          </div>
         </div>
       </div>
       <div class="pm-body" id="inventory-select-list" style="padding:10px 20px 20px 20px;">
@@ -4449,28 +4460,23 @@
       }
       lastRenderedBrandsJson = currentBrandsStateJson;
 
-      const container = document.getElementById('product-filter-chips');
+      const container = document.getElementById('product-filter-select');
       if (!container) return;
 
       container.innerHTML = '';
 
-      // Add "Semua" chip
-      const allChip = document.createElement('div');
-      allChip.className = `chip ${currentProductBrandFilter === 'All' ? 'active' : ''}`;
-      allChip.textContent = 'Semua';
-      allChip.dataset.brand = 'All';
-      allChip.onclick = () => filterProductBrand('All');
-      container.appendChild(allChip);
+      const allOption = document.createElement('option');
+      allOption.value = 'All';
+      allOption.textContent = 'Semua Brand';
+      container.appendChild(allOption);
 
-      // Add dynamic brand chips
       sortedBrands.forEach(brand => {
-        const chip = document.createElement('div');
-        chip.className = `chip ${currentProductBrandFilter === brand ? 'active' : ''}`;
-        chip.textContent = brand;
-        chip.dataset.brand = brand;
-        chip.onclick = () => filterProductBrand(brand);
-        container.appendChild(chip);
+        const option = document.createElement('option');
+        option.value = brand;
+        option.textContent = brand;
+        container.appendChild(option);
       });
+      container.value = currentProductBrandFilter;
     }
 
     function renderProductList() {
@@ -4568,10 +4574,8 @@
 
     function filterProductBrand(brand) {
       currentProductBrandFilter = brand;
-      document.querySelectorAll('.filter-chips .chip').forEach(c => {
-        if (c.dataset.brand === brand) c.classList.add('active');
-        else c.classList.remove('active');
-      });
+      const select = document.getElementById('product-filter-select');
+      if (select) select.value = brand;
       renderProductList();
     }
 
@@ -5082,12 +5086,8 @@
     function openInventorySelectModal(itemIdx) {
       activeInvoiceItemRowIndex = itemIdx;
       currentInventorySelectBrandFilter = 'All';
-      
-      // Reset chips UI
-      document.querySelectorAll('#inv-select-chips .chip').forEach(c => {
-        if (c.dataset.brand === 'All') c.classList.add('active');
-        else c.classList.remove('active');
-      });
+      const select = document.getElementById('inv-filter-select');
+      if (select) select.value = 'All';
 
       // Reset search input
       document.getElementById('inv-select-search').value = '';
@@ -5102,10 +5102,8 @@
 
     function filterInventorySelectBrand(brand) {
       currentInventorySelectBrandFilter = brand;
-      document.querySelectorAll('#inv-select-chips .chip').forEach(c => {
-        if (c.dataset.brand === brand) c.classList.add('active');
-        else c.classList.remove('active');
-      });
+      const select = document.getElementById('inv-filter-select');
+      if (select) select.value = brand;
       renderInventorySelectList();
     }
 
@@ -6939,10 +6937,8 @@
 
     function filterHistoryStatus(status) {
       currentHistoryStatusFilter = status;
-      document.querySelectorAll('#history-filter-chips .chip').forEach(c => {
-        if (c.dataset.hstatus === status) c.classList.add('active');
-        else c.classList.remove('active');
-      });
+      const select = document.getElementById('history-filter-select');
+      if (select) select.value = status;
       renderHistoryList();
     }
 
