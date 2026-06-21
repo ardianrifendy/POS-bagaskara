@@ -5012,7 +5012,7 @@
       showToast("Menyiapkan dokumen untuk dicetak...", false);
       
       // Jika berjalan di dalam aplikasi Android (Capacitor)
-      if (typeof CapBrowser !== 'undefined') {
+      if (window.Capacitor) {
         const data = currentPreviewData;
         if (!data) return;
         
@@ -5026,8 +5026,8 @@
         const printUrl = `https://ardianrifendy.github.io/POS-bagaskara/print.html?d=${encodedData}&s=${encodedStore}`;
         
         setTimeout(() => {
-          // Buka di browser eksternal bawaan sistem (Chrome) yang mendukung full print spooler
-          window.open(printUrl, '_system');
+          // Buka di browser eksternal bawaan sistem (Chrome)
+          window.open(printUrl, '_blank');
         }, 500);
       } else {
         // Jika berjalan di browser PC biasa
