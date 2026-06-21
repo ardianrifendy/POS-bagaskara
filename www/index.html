@@ -5492,16 +5492,23 @@
       if (inv.items && inv.items.length > 0) {
         inv.items.forEach(item => {
           addItemField();
-          document.getElementById('item-name-' + itemIndex).value = item.name;
-          document.getElementById('item-qty-' + itemIndex).value = item.qty;
-          document.getElementById('item-price-' + itemIndex).value = item.price;
-          document.getElementById('item-subtotal-' + itemIndex).value = item.sub;
           const row = document.getElementById('item-row-' + itemIndex);
+          document.getElementById('item-name-' + itemIndex).value = item.name;
+          
+          const qtyInput = row.querySelector('.item-qty');
+          if (qtyInput) qtyInput.value = item.qty;
+          
+          const priceInput = row.querySelector('.item-price');
+          if (priceInput) priceInput.value = item.price;
+          
+          const discountInput = row.querySelector('.item-discount');
+          if (discountInput && item.discount) discountInput.value = item.discount;
+          
+          const imeiInput = document.getElementById('imei-input-' + itemIndex);
+          if (imeiInput && item.imei) imeiInput.value = item.imei;
+          
           if (item.productId) {
             row.dataset.productId = item.productId;
-          }
-          if (item.imei) {
-            row.dataset.imei = item.imei;
           }
         });
       } else {
