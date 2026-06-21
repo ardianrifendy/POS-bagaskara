@@ -1711,14 +1711,15 @@
     /* PRINT STYLING */
     @media print {
       @page {
-        size: auto;
-        margin: 0;
+        size: letter landscape;
+        margin: 0.5cm;
       }
       body {
         margin: 0 !important;
-        padding: 12mm 15mm !important;
+        padding: 0 !important;
         background: #fff !important;
         color: #000 !important;
+        width: 1000px !important; /* Paksa lebar desktop agar Android WebView tidak menggencet tabel */
       }
       .topbar, .bottom-nav, .content-container, .preview-header-nav, .action-row, .live-banner, .no-print {
         display: none !important;
@@ -1730,13 +1731,15 @@
         padding: 0 !important;
         margin: 0 !important;
         overflow: visible !important;
+        width: 1000px !important;
       }
       .preview-box {
         box-shadow: none !important;
         border-radius: 0 !important;
-        padding: 10px !important;
-        margin: 0 auto !important;
-        max-width: 100% !important;
+        padding: 20px !important;
+        margin: 0 !important;
+        width: 1000px !important;
+        max-width: 1000px !important;
       }
       .inv-header {
         background: #1a1a1a !important;
