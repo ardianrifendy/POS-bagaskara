@@ -2092,44 +2092,6 @@
       padding: 10px 0 20px 0;
       border-bottom: 1px solid rgba(255,255,255,0.03);
     }
-
-    /* HISTORY ACCORDION */
-    .history-month-header {
-      background: rgba(255,255,255,0.05);
-      padding: 14px 16px;
-      border-radius: 12px;
-      margin-bottom: 10px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      cursor: pointer;
-      font-weight: 700;
-      font-size: 14px;
-      color: var(--white);
-      transition: background 0.2s;
-      border: 1px solid rgba(255,255,255,0.08);
-    }
-    .history-month-header:active {
-      background: rgba(255,255,255,0.08);
-    }
-    .history-month-header .chevron {
-      transition: transform 0.3s;
-      color: var(--gy);
-    }
-    .history-month-header.open .chevron {
-      transform: rotate(180deg);
-    }
-    .history-acc-content {
-      max-height: 0;
-      overflow: hidden;
-      transition: max-height 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-      opacity: 0;
-    }
-    .history-acc-content.open {
-      max-height: 4000px;
-      opacity: 1;
-      padding-bottom: 12px;
-    }
     .acc-chevron {
       transition: transform 0.3s ease;
     }
@@ -4495,104 +4457,983 @@
       });
 
       if (filtered.length === 0) {
+        feed.innerHTML = `
+          <div style="text-align:center; padding: 60px 20px; color:var(--gy); font-size:13px; display:flex; flex-direction:column; align-items:center;">
+            <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="margin-bottom:16px; opacity:0.4;"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect><line x1="8" y1="21" x2="16" y2="21"></line><line x1="12" y1="17" x2="12" y2="21"></line></svg>
+            Belum ada produk atau tidak ditemukan.
+          </div>`;
+        return;
+      }
+
+      filtered.forEach(p => {
+        const condClass = `badge-${p.condition.toLowerCase()}`;
+        const card = document.createElement('div');
+        card.className = 'product-card';
+        card.innerHTML = `
+          <div class="prod-header">
+            <div>
+              <div class="prod-title">${p.brand} ${p.model}</div>
+              <div class="prod-specs">
+                <span class="spec-item">${p.ram} / ${p.storage}</span>
+                ${p.color ? `<span class="spec-item">${p.color}</span>` : ''}
+                ${p.imei ? `<span class="spec-item" style="font-family:monospace;">IMEI: ${p.imei}</span>` : ''}
+              </div>
+            </div>
+            <div style="display:flex; flex-direction:column; align-items:flex-end; gap:6px;">
+              <span class="prod-badge ${condClass}">${p.condition}</span>
+              ${p.status === 'Terjual' ? '<span class="prod-badge" style="background:rgba(239, 68, 68, 0.15); color:var(--rd);">Terjual</span>' : '<span class="prod-badge" style="background:rgba(34, 197, 94, 0.15); color:var(--gn);">Stok Ready</span>'}
+            </div>
+          </div>
+          <div class="prod-price-row">
+            <div class="price-box">
+              <span class="price-lbl">Harga Beli</span>
+              <span class="price-val buy">Rp ${(p.priceBuy || 0).toLocaleString('id-ID')}</span>
+            </div>
+            <div class="price-box">
+              <span class="price-lbl">Harga Jual</span>
+              <span class="price-val sell">Rp ${(p.priceSell || 0).toLocaleString('id-ID')}</span>
+            </div>
+            <div class="price-box" style="text-align:right;">
+              <span class="price-lbl">Asal / Supplier</span>
+              <span style="font-size:12px; color:#fff; font-weight:500;">${p.source || '-'}</span>
+            </div>
+          </div>
+          ${p.notes ? `<div style="font-size:12px; color:var(--gy); margin-top:2px; font-style:italic;">Catatan: ${p.notes}</div>` : ''}
+          ${p.log && p.log.length > 0 ? `
+            <div style="margin-top: 8px; border-top: 1px dashed rgba(255,255,255,0.06); padding-top: 8px;">
+              <span style="font-size: 10.5px; font-weight: 700; color: var(--or); cursor: pointer;" onclick="toggleProductLog(${p.id})">
+                📜 Lihat Riwayat Aktivitas (${p.log.length})
+              </span>
+              <div id="prod-log-${p.id}" style="display: none; margin-top: 6px; background: rgba(0,0,0,0.15); border-radius: 8px; padding: 6px 10px; max-height: 120px; overflow-y: auto;">
+                ${p.log.map(entry => `
+                  <div style="font-size: 10.5px; line-height: 1.4; border-bottom: 1px solid rgba(255,255,255,0.03); padding: 4px 0;">
+                    <div style="color: var(--gy); font-size: 9.5px;">${entry.timestamp}</div>
+                    <div style="color: #fff; font-weight: 600;">${entry.action}</div>
+                    ${entry.notes ? `<div style="color: var(--gy); font-size: 10px;">${entry.notes}</div>` : ''}
+                  </div>
+                `).reverse().join('')}
+              </div>
+            </div>
+          ` : ''}
+          <div class="prod-actions">
+            <button class="btn-icon edit" onclick="editProduct('${p.id}')" title="Edit Produk">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 1 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+            </button>
+            <button class="btn-icon delete" onclick="deleteProduct('${p.id}')" title="Hapus Produk">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+            </button>
+          </div>
+        `;
+        feed.appendChild(card);
+      });
+    }
+
+    function filterProductBrand(brand) {
+      currentProductBrandFilter = brand;
+      document.querySelectorAll('.filter-chips .chip').forEach(c => {
+        if (c.dataset.brand === brand) c.classList.add('active');
+        else c.classList.remove('active');
+      });
+      renderProductList();
+    }
+
+    function openProductModal(prodId = null) {
+      document.getElementById('product-modal').classList.add('show');
+      
+      // Close dropdowns
+      document.querySelectorAll('.autocomplete-suggestions').forEach(d => d.style.display = 'none');
+      
+      if (prodId) {
+        // Edit mode
+        const p = products.find(x => x.id == prodId);
+        if (p) {
+          document.getElementById('pm-modal-title').textContent = 'Edit Produk';
+          document.getElementById('prod-id').value = p.id;
+          document.getElementById('prod-brand').value = p.brand;
+          document.getElementById('prod-model').value = p.model;
+          document.getElementById('prod-ram').value = p.ram;
+          document.getElementById('prod-storage').value = p.storage;
+          document.getElementById('prod-color').value = p.color || '';
+          document.getElementById('prod-condition').value = p.condition;
+          
+          // Set dropdown condition display
+          document.querySelector('#product-modal [data-target="prod-condition"]').textContent = p.condition;
+          document.querySelectorAll('#product-modal .cs-dropdown .cs-option').forEach(o => {
+            if (o.dataset.value === p.condition) o.classList.add('active');
+            else o.classList.remove('active');
+          });
+
+          document.getElementById('prod-price-buy').value = p.priceBuy;
+          document.getElementById('prod-price-sell').value = p.priceSell;
+          document.getElementById('prod-source').value = p.source || '';
+          document.getElementById('prod-warranty-type').value = p.warrantyType || 'none';
+          
+          // Set dropdown warranty type
+          const wName = p.warrantyType === 'personal' ? 'Garansi Personal (Toko)' : (p.warrantyType === 'resmi' ? 'Garansi Resmi Brand' : (p.warrantyType === 'both' ? 'Garansi Toko & Resmi Brand' : 'Tanpa Garansi'));
+          document.querySelector('#product-modal [data-target="prod-warranty-type"]').textContent = wName;
+          
+          document.getElementById('prod-imei').value = p.imei || '';
+          document.getElementById('prod-notes').value = p.notes || '';
+        }
+      } else {
+        // Add mode
+        document.getElementById('pm-modal-title').textContent = 'Tambah Produk Baru';
+        document.getElementById('prod-id').value = '';
+        document.getElementById('prod-brand').value = '';
+        document.getElementById('prod-model').value = '';
+        document.getElementById('prod-ram').value = '';
+        document.getElementById('prod-storage').value = '';
+        document.getElementById('prod-color').value = '';
+        document.getElementById('prod-condition').value = 'Baru';
+        document.querySelector('#product-modal [data-target="prod-condition"]').textContent = 'Baru';
+        document.getElementById('prod-price-buy').value = '';
+        document.getElementById('prod-price-sell').value = '';
+        document.getElementById('prod-source').value = '';
+        document.getElementById('prod-warranty-type').value = 'none';
+        document.querySelector('#product-modal [data-target="prod-warranty-type"]').textContent = 'Tanpa Garansi';
+        document.getElementById('prod-imei').value = '';
+        document.getElementById('prod-notes').value = '';
+      }
+    }
+
+    function closeProductModal() {
+      document.getElementById('product-modal').classList.remove('show');
+    }
+
+    function saveProduct() {
+      const id = document.getElementById('prod-id').value;
+      const brand = document.getElementById('prod-brand').value.trim();
+      const model = document.getElementById('prod-model').value.trim();
+      const ram = document.getElementById('prod-ram').value.trim();
+      const storage = document.getElementById('prod-storage').value.trim();
+      const color = document.getElementById('prod-color').value.trim();
+      const condition = document.getElementById('prod-condition').value;
+      const priceBuy = parseInt(document.getElementById('prod-price-buy').value) || 0;
+      const priceSell = parseInt(document.getElementById('prod-price-sell').value) || 0;
+      const source = document.getElementById('prod-source').value.trim();
+      const warrantyType = document.getElementById('prod-warranty-type').value;
+      const imei = document.getElementById('prod-imei').value.trim();
+      const notes = document.getElementById('prod-notes').value.trim();
+
+      if (!brand || !model || !ram || !storage) {
+        showToast('⚠️ Merek, Tipe, RAM, dan Storage wajib diisi!', true);
+        return;
+      }
+
+      const pData = {
+        id: id ? parseInt(id) : Date.now(),
+        brand,
+        model,
+        ram,
+        storage,
+        color,
+        condition,
+        priceBuy,
+        priceSell,
+        source,
+        warrantyType,
+        imei,
+        notes,
+        status: id ? (products.find(x => x.id == id)?.status || 'Tersedia') : 'Tersedia',
+        log: id ? (products.find(x => x.id == id)?.log || []) : []
+      };
+
+      if (!id) {
+        pData.log.push({
+          timestamp: getFormattedTimestamp(),
+          action: 'Stok Masuk',
+          notes: `Harga Beli: Rp ${priceBuy.toLocaleString('id-ID')} | Supplier: ${source || '-'}`
+        });
+      } else {
+        pData.log.push({
+          timestamp: getFormattedTimestamp(),
+          action: 'Detail Diupdate',
+          notes: `Harga Jual: Rp ${priceSell.toLocaleString('id-ID')}`
+        });
+      }
+
+      if (id) {
+        const index = products.findIndex(x => x.id == id);
+        if (index > -1) products[index] = pData;
+      } else {
+        products.unshift(pData);
+      }
+
+      saveProducts();
+      renderProductList();
+      closeProductModal();
+      showToast('Produk berhasil disimpan!');
+    }
+
+    function editProduct(prodId) {
+      openProductModal(prodId);
+    }
+
+    function deleteProduct(prodId) {
+      if (confirm('Hapus produk ini dari inventori?')) {
+        products = products.filter(x => x.id != prodId);
+        saveProducts();
+        renderProductList();
+        showToast('Produk berhasil dihapus!', true);
+      }
+    }
+
+    function showBrandSuggestions(val) {
+      const list = document.getElementById('brand-suggestions');
+      list.innerHTML = '';
+      if (!val) {
+        list.style.display = 'none';
+        return;
+      }
+
+      const matchVal = val.toLowerCase();
+      const uniqueBrands = [...new Set(phoneCatalog.map(x => x.brand))];
+      const filtered = uniqueBrands.filter(b => b.toLowerCase().includes(matchVal)).slice(0, 5);
+
+      if (filtered.length === 0) {
+        list.style.display = 'none';
+        return;
+      }
+
+      filtered.forEach(brand => {
+        const item = document.createElement('div');
+        item.className = 'suggestion-item';
+        item.textContent = brand;
+        item.onclick = () => {
+          document.getElementById('prod-brand').value = brand;
+          list.style.display = 'none';
+          document.getElementById('prod-model').value = '';
+        };
+        list.appendChild(item);
+      });
+      list.style.display = 'block';
+    }
+
+    function showModelSuggestions(val) {
+      const list = document.getElementById('model-suggestions');
+      list.innerHTML = '';
+      if (!val) {
+        list.style.display = 'none';
+        return;
+      }
+
+      const brand = document.getElementById('prod-brand').value.trim();
+      const matchVal = val.toLowerCase();
+      
+      let filtered = phoneCatalog;
+      if (brand) {
+        filtered = filtered.filter(x => x.brand.toLowerCase() === brand.toLowerCase());
+      }
+      filtered = filtered.filter(x => x.model.toLowerCase().includes(matchVal)).slice(0, 8);
+
+      if (filtered.length === 0) {
+        list.style.display = 'none';
+        return;
+      }
+
+      filtered.forEach(p => {
+        const item = document.createElement('div');
+        item.className = 'suggestion-item';
+        let txt = p.model;
+        if (p.price) txt += ` - Rp ${p.price.toLocaleString('id-ID')}`;
+        item.textContent = txt;
+        item.onclick = () => {
+          document.getElementById('prod-model').value = p.model;
+          if (!brand) {
+            document.getElementById('prod-brand').value = p.brand;
+          }
+          if (p.ram) document.getElementById('prod-ram').value = p.ram;
+          if (p.storage) document.getElementById('prod-storage').value = p.storage;
+          if (p.price) document.getElementById('prod-price-sell').value = p.price;
+          list.style.display = 'none';
+        };
+        list.appendChild(item);
+      });
+      list.style.display = 'block';
+    }
+
+    // PRICE CHECKER LOGIC
+    let currentPcPriceFilter = 'all';
+    let currentPcBrandFilters = new Set();
+    let currentPcCategoryFilters = new Set();
+
+    function populateKatalogFilters() {
+      const brands = new Set();
+      const cats = new Set();
+      phoneCatalog.forEach(p => {
+        if(p.brand) brands.add(p.brand);
+        if(p.category) cats.add(p.category);
+      });
+      
+      let bHtml = `<button class="chip active" data-val="all" onclick="kfSelect('brand', 'all')">Semua</button>`;
+      Array.from(brands).sort().forEach(b => {
+        bHtml += `<button class="chip" data-val="${b}" onclick="kfSelect('brand', '${b}')">${b}</button>`;
+      });
+      document.getElementById('kf-brand').innerHTML = bHtml;
+
+      let cHtml = `<button class="chip active" data-val="all" onclick="kfSelect('category', 'all')">Semua</button>`;
+      Array.from(cats).sort().forEach(c => {
+        cHtml += `<button class="chip" data-val="${c}" onclick="kfSelect('category', '${c}')">${c}</button>`;
+      });
+      document.getElementById('kf-category').innerHTML = cHtml;
+    }
+
+    function openKatalogFilterModal() {
+      document.getElementById('katalog-filter-modal').classList.add('show');
+    }
+    
+    function closeKatalogFilterModal() {
+      document.getElementById('katalog-filter-modal').classList.remove('show');
+      renderPriceCheckerList();
+    }
+    
+    function kfSelect(type, val) {
+      if(type === 'price') {
+        currentPcPriceFilter = val;
+        document.querySelectorAll(`#kf-price .chip`).forEach(c => {
+          if(c.dataset.val === val) c.classList.add('active');
+          else c.classList.remove('active');
+        });
+      } else {
+        const filters = type === 'brand' ? currentPcBrandFilters : currentPcCategoryFilters;
+        if(val === 'all') {
+          filters.clear();
+        } else {
+          if(filters.has(val)) filters.delete(val);
+          else filters.add(val);
+        }
+        
+        document.querySelectorAll(`#kf-${type} .chip`).forEach(c => {
+          if(c.dataset.val === 'all') {
+            if(filters.size === 0) c.classList.add('active');
+            else c.classList.remove('active');
+          } else {
+            if(filters.has(c.dataset.val)) c.classList.add('active');
+            else c.classList.remove('active');
+          }
+        });
+      }
+    }
+
+    function kfReset() {
+      kfSelect('price', 'all');
+      kfSelect('brand', 'all');
+      kfSelect('category', 'all');
+    }
+
+    function renderPriceCheckerList() {
+      const list = document.getElementById('pc-results-list');
+      list.innerHTML = '';
+      
+      if (!phoneCatalog || phoneCatalog.length === 0) {
+        list.innerHTML = `<div style="text-align:center; padding: 20px; color: var(--gy); font-size: 13px;">Sedang memuat data katalog...</div>`;
+        return;
+      }
+
+      const val = document.getElementById('pc-search-input').value.toLowerCase().trim();
+      let filtered = phoneCatalog;
+
+      // Apply price filter (using price_min for grouped data)
+      if (currentPcPriceFilter !== 'all') {
+        filtered = filtered.filter(p => {
+          let price = p.price_min || p.price || 0;
+          if (price === 0) return false;
+          if (currentPcPriceFilter === 'under1') return price < 1000000;
+          if (currentPcPriceFilter === '1to3') return price >= 1000000 && price < 3000000;
+          if (currentPcPriceFilter === '3to5') return price >= 3000000 && price < 5000000;
+          if (currentPcPriceFilter === '5to10') return price >= 5000000 && price <= 10000000;
+          if (currentPcPriceFilter === 'above10') return price > 10000000;
+          return true;
+        });
+      }
+
+      // Apply brand filter
+      if (currentPcBrandFilters.size > 0) {
+        filtered = filtered.filter(p => currentPcBrandFilters.has(p.brand));
+      }
+      
+      // Apply category filter
+      if (currentPcCategoryFilters.size > 0) {
+        filtered = filtered.filter(p => currentPcCategoryFilters.has(p.category));
+      }
+
+      // Apply text search
+      if (val) {
+        filtered = filtered.filter(x => x.model.toLowerCase().includes(val) || x.brand.toLowerCase().includes(val));
+      }
+
+      // Limit results to top 100 for performance (to not freeze UI)
+      filtered = filtered.slice(0, 100);
+
+      if (filtered.length === 0) {
+        list.innerHTML = `
+          <div style="text-align:center; padding: 60px 20px; color: var(--gy); font-size: 13px; display:flex; flex-direction:column; align-items:center;">
+            <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="margin-bottom:16px; opacity:0.4;"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+            Tidak ada hasil ditemukan.
+          </div>`;
+        return;
+      }
+
+      filtered.forEach(p => {
+        const card = document.createElement('div');
+        card.style.background = 'var(--bk3)';
+        card.style.padding = '14px';
+        card.style.borderRadius = '12px';
+        card.style.marginBottom = '12px';
+        card.style.transition = 'all 0.3s ease';
+        
+        let priceStr = '-';
+        if (p.price_min && p.price_min === p.price_max) {
+             priceStr = `Rp ${p.price_min.toLocaleString('id-ID')}`;
+        } else if (p.price_min && p.price_max) {
+             priceStr = `Rp ${p.price_min.toLocaleString('id-ID')} - Rp ${p.price_max.toLocaleString('id-ID')}`;
+        } else if (p.price) {
+             priceStr = `Rp ${p.price.toLocaleString('id-ID')}`;
+        }
+
+        let variantsHtml = '';
+        let colorButtonsHtml = '';
+        let defaultImage = p.image || ''; 
+        
+        if (p.variants && p.variants.length > 0) {
+            const firstWithImage = p.variants.find(v => v.image);
+            if (firstWithImage) defaultImage = firstWithImage.image;
+            
+            const capMap = new Map();
+            p.variants.forEach(v => {
+               if (!v.capacity) return;
+               if (!capMap.has(v.capacity)) {
+                   capMap.set(v.capacity, v.price);
+               } else {
+                   if (v.price < capMap.get(v.capacity)) capMap.set(v.capacity, v.price);
+               }
+            });
+            
+            let capListHtml = '';
+            capMap.forEach((price, cap) => {
+                capListHtml += `
+                  <div style="display:flex; justify-content:space-between; align-items:center; font-size:12px; background:var(--bk); padding:8px 10px; border-radius:6px;">
+                    <div style="color:var(--white); font-weight:600;">${cap}</div>
+                    <div style="color:var(--or); font-weight:bold;">Rp ${price.toLocaleString('id-ID')}</div>
+                  </div>
+                `;
+            });
+            
+            const colorMap = new Map(); 
+            p.variants.forEach(v => {
+               if (v.color && !colorMap.has(v.color)) {
+                   colorMap.set(v.color, v.image || defaultImage);
+               }
+            });
+            
+            if (colorMap.size > 0) {
+                colorMap.forEach((imgUrl, color) => {
+                    colorButtonsHtml += `<button class="color-btn" data-img="${imgUrl}" style="background:var(--bk); border:1px solid rgba(255,255,255,0.1); color:var(--white); padding:6px 12px; border-radius:20px; font-size:11px; font-weight:600; cursor:pointer; transition:all 0.2s;">${color}</button>`;
+                });
+            }
+            
+            variantsHtml = `
+              <div style="display:flex; gap:12px; margin-bottom:12px;">
+                 <div style="width: 80px; height: 100px; background:#fff; border-radius:8px; display:flex; align-items:center; justify-content:center; overflow:hidden; padding:4px; flex-shrink:0;">
+                    <img class="preview-img" src="${defaultImage}" style="max-width:100%; max-height:100%; object-fit:contain;" onerror="this.src='logo-light.png'">
+                 </div>
+                 <div style="flex:1; display:flex; flex-direction:column; gap:6px; justify-content:center;">
+                    ${capListHtml || '<div style="color:var(--gy); font-size:12px; font-style:italic;">Kapasitas tidak disebutkan</div>'}
+                 </div>
+              </div>
+              ${colorMap.size > 0 ? `
+              <div style="font-size:11px; color:var(--gy); margin-bottom:8px; font-weight:600;">Pilih Warna:</div>
+              <div class="color-picker" style="display:flex; flex-wrap:wrap; gap:6px;">
+                 ${colorButtonsHtml}
+              </div>
+              ` : ''}
+            `;
+        }
+
+        card.innerHTML = `
+          <div class="card-header" style="display:flex; justify-content:space-between; align-items:center; cursor:pointer;">
+            <div style="flex:1; padding-right:10px;">
+              <div style="font-size:12px; color:var(--gy); font-weight:600;">${p.brand}</div>
+              <div style="font-size:15px; color:var(--white); font-weight:700; margin-top:2px;">${p.model}</div>
+              <div style="font-size:12px; color:var(--or); margin-top:6px; font-weight:600;">Lihat ${p.variants ? p.variants.length : 0} Varian</div>
+            </div>
+            <div style="text-align:right;">
+              <div style="font-size:10px; color:var(--gy); margin-bottom:2px;">Harga Acuan</div>
+              <div style="font-size:14px; font-weight:800; color:var(--or);">${priceStr}</div>
+              <div class="chevron" style="font-size:12px; color:var(--gy); margin-top:6px; transition: transform 0.3s; display:inline-block;">▼</div>
+            </div>
+          </div>
+          <div class="variants-container" style="display:none; margin-top:14px; padding-top:14px; border-top:1px solid var(--bk3);">
+            ${variantsHtml}
+          </div>
+        `;
+        
+        const header = card.querySelector('.card-header');
+        const container = card.querySelector('.variants-container');
+        const chevron = card.querySelector('.chevron');
+        
+        const colorBtns = card.querySelectorAll('.color-btn');
+        const previewImg = card.querySelector('.preview-img');
+        
+        colorBtns.forEach(btn => {
+           btn.addEventListener('click', (e) => {
+              e.stopPropagation();
+              colorBtns.forEach(b => {
+                  b.style.background = 'var(--bk)';
+                  b.style.borderColor = 'rgba(255,255,255,0.1)';
+                  b.style.color = 'var(--white)';
+              });
+              btn.style.background = 'rgba(247, 147, 26, 0.15)';
+              btn.style.borderColor = 'var(--or)';
+              btn.style.color = 'var(--or)';
+              
+              const imgUrl = btn.getAttribute('data-img');
+              if (imgUrl && previewImg) previewImg.src = imgUrl;
+           });
+        });
+        
+        if (previewImg) {
+            previewImg.addEventListener('click', (e) => {
+                e.stopPropagation();
+                let zoomModal = document.getElementById('catalog-zoom-modal');
+                let zoomImg = document.getElementById('catalog-zoom-img');
+                if (!zoomModal) {
+                    zoomModal = document.createElement('div');
+                    zoomModal.id = 'catalog-zoom-modal';
+                    zoomModal.style = 'display:flex; position:fixed; top:0; left:0; right:0; bottom:0; background:rgba(0,0,0,0.9); z-index:9999; align-items:center; justify-content:center; padding:20px; flex-direction:column;';
+                    zoomModal.onclick = function() { this.style.display = 'none'; };
+                    zoomModal.innerHTML = `
+                      <div style="position:absolute; top:20px; right:20px; width:40px; height:40px; background:var(--bk2); border-radius:50%; display:flex; align-items:center; justify-content:center; color:#fff; font-weight:bold; font-size:20px; cursor:pointer; border:1px solid rgba(255,255,255,0.1);">&times;</div>
+                      <img id="catalog-zoom-img" src="" style="max-width:100%; max-height:80vh; object-fit:contain; border-radius:12px;">
+                      <div style="margin-top:20px; color:var(--gy); font-size:12px;">Ketuk dimana saja untuk menutup</div>
+                    `;
+                    document.body.appendChild(zoomModal);
+                    zoomImg = document.getElementById('catalog-zoom-img');
+                }
+                zoomImg.src = previewImg.src;
+                zoomModal.style.display = 'flex';
+            });
+        }
+        
+        header.addEventListener('click', () => {
+            if (container.style.display === 'none') {
+                container.style.display = 'block';
+                chevron.style.transform = 'rotate(180deg)';
+                card.style.background = 'var(--bk2)';
+                card.style.border = '1px solid var(--or)';
+            } else {
+                container.style.display = 'none';
+                chevron.style.transform = 'rotate(0deg)';
+                card.style.background = 'var(--bk3)';
+                card.style.border = 'none';
+            }
+        });
+        
+        list.appendChild(card);
+      });
+    }
+
+    function openOcrForProduct() {
+      openOcrScanner('prod-imei');
+    }
+
+    // INVENTORY SELECT LOGIC
+    let activeInvoiceItemRowIndex = null;
+    let currentInventorySelectBrandFilter = 'All';
+
+    function openInventorySelectModal(itemIdx) {
+      activeInvoiceItemRowIndex = itemIdx;
+      currentInventorySelectBrandFilter = 'All';
+      
+      // Reset chips UI
+      document.querySelectorAll('#inv-select-chips .chip').forEach(c => {
+        if (c.dataset.brand === 'All') c.classList.add('active');
+        else c.classList.remove('active');
+      });
+
+      // Reset search input
+      document.getElementById('inv-select-search').value = '';
+      
+      renderInventorySelectList();
+      document.getElementById('inventory-select-modal').classList.add('show');
+    }
+
+    function closeInventorySelectModal() {
+      document.getElementById('inventory-select-modal').classList.remove('show');
+    }
+
+    function filterInventorySelectBrand(brand) {
+      currentInventorySelectBrandFilter = brand;
+      document.querySelectorAll('#inv-select-chips .chip').forEach(c => {
+        if (c.dataset.brand === brand) c.classList.add('active');
+        else c.classList.remove('active');
+      });
+      renderInventorySelectList();
+    }
+
+    function renderInventorySelectList() {
+      const query = document.getElementById('inv-select-search').value.toLowerCase().trim();
+      const container = document.getElementById('inventory-select-list');
+      container.innerHTML = '';
+
+      // Only display products that are "Tersedia"
+      const available = products.filter(p => {
+        const s = (p.status || '').trim().toLowerCase();
+        return s !== 'terjual';
+      });
+
+      const filtered = available.filter(p => {
+        // Brand filter
+        if (currentInventorySelectBrandFilter !== 'All' && p.brand !== currentInventorySelectBrandFilter) return false;
+
+        // Search query
+        const inBrand = p.brand.toLowerCase().includes(query);
+        const inModel = p.model.toLowerCase().includes(query);
+        const inImei = (p.imei || '').toLowerCase().includes(query);
+        const inColor = (p.color || '').toLowerCase().includes(query);
+        return inBrand || inModel || inImei || inColor;
+      });
+
+      if (filtered.length === 0) {
+        container.innerHTML = `<div style="text-align:center; padding: 30px; color:var(--gy); font-size:13px;">Stok tidak tersedia atau tidak ditemukan.</div>`;
+        return;
+      }
+
+      filtered.forEach(p => {
+        const itemRow = document.createElement('div');
+        itemRow.className = 'history-card';
+        itemRow.style.cssText = 'cursor:pointer; margin-bottom:10px; transition:border-color 0.2s; border:1px solid rgba(255,255,255,0.06);';
+        itemRow.onclick = () => selectProductForInvoiceRow(p.id);
+
+        // Hover effect helper via JS
+        itemRow.onmouseenter = () => itemRow.style.borderColor = 'var(--or)';
+        itemRow.onmouseleave = () => itemRow.style.borderColor = 'rgba(255,255,255,0.06)';
+
+        itemRow.innerHTML = `
+          <div class="hc-top">
+            <div class="hc-inv" style="color:#fff;">${p.brand} ${p.model}</div>
+            <div class="hc-date"><span class="prod-badge badge-${p.condition.toLowerCase()}">${p.condition}</span></div>
+          </div>
+          <div style="font-size:12.5px; color:var(--gy); margin:4px 0;">
+            Spesifikasi: <strong>${p.ram}/${p.storage}</strong> ${p.color ? `• Warna: ${p.color}` : ''}
+          </div>
+          ${p.imei ? `<div style="font-size:12px; font-family:monospace; color:var(--or); margin-bottom:6px;">IMEI: ${p.imei}</div>` : ''}
+          <div class="hc-bot" style="margin-top:4px; padding-top:4px; border-top:1px dashed rgba(255,255,255,0.04);">
+            <div class="hc-total" style="color:var(--gn); font-size:14px;">Rp ${(p.priceSell || 0).toLocaleString('id-ID')}</div>
+            <span style="font-size:11px; color:var(--gy);">Supplier: ${p.source || '-'}</span>
+          </div>
+        `;
+        container.appendChild(itemRow);
+      });
+    }
+
+    function selectProductForInvoiceRow(productId) {
+      const p = products.find(x => x.id === productId);
+      if (!p) return;
+
+      const row = document.getElementById(`item-row-${activeInvoiceItemRowIndex}`);
+      if (row) {
+        row.dataset.productId = p.id;
+        
+        // Populate fields
+        const nameInput = row.querySelector('.item-name');
+        const imeiInput = row.querySelector('.item-imei');
+        const qtyInput = row.querySelector('.item-qty');
+        const priceInput = row.querySelector('.item-price');
+
+        const specString = `(${p.ram}/${p.storage}${p.color ? ' - ' + p.color : ''})`;
+        nameInput.value = `${p.brand} ${p.model} ${specString}`;
+        
+        if (p.imei) imeiInput.value = p.imei;
+        priceInput.value = p.priceSell || 0;
+        qtyInput.value = 1;
+
+        updateLiveTotal();
+        closeInventorySelectModal();
+        showToast(`Stok ${p.brand} ${p.model} berhasil dipilih!`);
+      }
+    }
+
+    // Hide autocomplete suggestions on outside click
+    document.addEventListener('click', function(e) {
+      if (!e.target.closest('.autocomplete-wrap')) {
+        document.querySelectorAll('.autocomplete-suggestions').forEach(d => d.style.display = 'none');
+      }
+    });
+
+    // LOCALSTORAGE DATABASE MANAGER
+    function saveDatabase() {
+      localStorage.setItem('bagaskara_invoices', JSON.stringify(database));
+    }
+
+    function loadDatabase() {
+      const raw = localStorage.getItem('bagaskara_invoices');
+      if (raw) {
+        database = JSON.parse(raw);
+      } else {
+        database = [];
+      }
+    }
+
+    // DASHBOARD STATS CALCULATOR
+    
+    function renderDashboardChart() {
+      const chartContainer = document.getElementById('dashboard-chart');
+      if (!chartContainer) return;
+      
+      chartContainer.innerHTML = ''; // clear
+
+      // Get last 7 days
+      const days = [];
+      const totals = [];
+      let maxTotal = 0;
+      
+      // Initialize last 7 days
+      for (let i = 6; i >= 0; i--) {
+        const d = new Date();
+        d.setDate(d.getDate() - i);
+        const dateStr = d.toLocaleDateString('id-ID', { day: '2-digit', month: 'short' });
+        
+        // adjust for local timezone offset
+        const offset = d.getTimezoneOffset() * 60000;
+        const localISOTime = (new Date(d.getTime() - offset)).toISOString().split('T')[0];
+        const matchDate = localISOTime;
+        
+        // Calculate total for this day
+        let dayTotal = 0;
+        database.forEach(t => {
+           if (t.dateVal === matchDate && (t.paymentStatus === 'lunas' || t.paymentStatus === 'dp')) {
+              dayTotal += t.grandTotal;
+           }
+        });
+        
+        days.push(dateStr);
+        totals.push(dayTotal);
+        if (dayTotal > maxTotal) maxTotal = dayTotal;
+      }
+      
+      // If maxTotal is 0, make it 1 so we don't divide by 0
+      if (maxTotal === 0) maxTotal = 1;
+
+      const lang = localStorage.getItem('bagaskara_lang') || 'id';
+      const jtStr = lang === 'en' ? 'M' : 'Jt';
+
+      // Render Y-Axis
+      const formatAxis = (val) => {
+        if(val >= 1000000) return (val/1000000).toFixed(1).replace('.0','') + jtStr;
+        if(val >= 1000) return (val/1000).toFixed(0) + 'K';
+        return val;
+      };
+      
+      const yAxis = document.createElement('div');
+      yAxis.className = 'chart-y-axis';
+      yAxis.innerHTML = `
+        <span>${formatAxis(maxTotal)}</span>
+        <span>${formatAxis(maxTotal/2)}</span>
+        <span>0</span>
+      `;
+      chartContainer.appendChild(yAxis);
+
+      // Render bars
+      for (let i = 0; i < 7; i++) {
+        const percent = Math.max((totals[i] / maxTotal) * 100, 2); // min 2% so it's visible
+        const formattedTotal = formatAxis(totals[i]);
+        
+        const col = document.createElement('div');
+        col.className = 'chart-col';
+        col.innerHTML = `
+          <div class="chart-bar-wrapper">
+            <div class="chart-val-tooltip">${formattedTotal}</div>
+            <div class="chart-bar" style="height: 0%"></div>
+          </div>
+          <div class="chart-label">${days[i].split(' ')[0]}</div>
+        `;
+        chartContainer.appendChild(col);
+        
+        // trigger animation
+        setTimeout(() => {
+          col.querySelector('.chart-bar').style.height = percent + '%';
+        }, 50 + (i * 50));
+      }
+    }
+    
+    function updateDashboardStats() {
+      renderDashboardChart();
+      // Get today string YYYY-MM-DD
+      const today = new Date();
+      const yyyy = today.getFullYear();
+      let mm = today.getMonth() + 1;
+      let dd = today.getDate();
+      if (dd < 10) dd = '0' + dd;
+      if (mm < 10) mm = '0' + mm;
+      const todayStr = `${yyyy}-${mm}-${dd}`;
+
+      // Filter invoices for today
+      const todayInvoices = database.filter(inv => inv.dateVal === todayStr);
+      const todayCount = todayInvoices.length;
+      const todayRevenue = todayInvoices.reduce((sum, inv) => sum + inv.grandTotal, 0);
+
+      // Inventory calculations
+      const availableProducts = products.filter(p => p.status !== 'Terjual');
+      const totalStokCount = availableProducts.length;
+      const totalInventoryValue = availableProducts.reduce((sum, p) => sum + (p.priceBuy || 0), 0);
+
+      // Piutang calculations
+      const piutangInvoices = database.filter(inv => inv.paymentStatus === 'dp' || inv.paymentStatus === 'belum_bayar');
+      const totalPiutang = piutangInvoices.reduce((sum, inv) => sum + (inv.amountRemaining || 0), 0);
+      const uniqueDebtors = new Set(piutangInvoices.map(inv => inv.custName)).size;
+
+      const lang = localStorage.getItem('bagaskara_lang') || 'id';
+      const tMap = translations[lang] || translations.id;
+      const unitStr = tMap["Unit"] || "Unit";
+      const invStr = tMap["Invoice Terdaftar"] || "Invoice Terdaftar";
+
+      document.getElementById('stat-count-today').innerText = todayCount;
+      document.getElementById('stat-revenue-today').innerText = `Rp ${todayRevenue.toLocaleString('id-ID')}`;
+      document.getElementById('stat-inventory-qty').innerText = `${totalStokCount} ${unitStr}`;
+      document.getElementById('stat-inventory-value').innerText = `Rp ${totalInventoryValue.toLocaleString('id-ID')}`;
+      document.getElementById('stat-total-db').innerHTML = `${database.length} <span style="font-size:12px; font-weight:400; color:var(--gy)">${invStr}</span>`;
+
+      // Show/hide piutang card on dashboard
+      const piutangCard = document.getElementById('piutang-dashboard-card');
+      if (piutangInvoices.length > 0) {
+        piutangCard.style.display = 'block';
+        renderPiutangDashboard(piutangInvoices);
+      } else {
+        piutangCard.style.display = 'none';
+      }
+
+      // Render 5 recent invoices
+      renderRecentFeed();
+    }
+
+    function renderPiutangDashboard(piutangInvoices) {
+      const container = document.getElementById('piutang-dashboard-list');
+      const top5 = piutangInvoices.slice(0, 5);
+      container.innerHTML = top5.map(inv => `
+        <div class="piutang-item">
+          <div>
+            <div class="piutang-name">${inv.custName}</div>
+            <div class="piutang-inv">${inv.invNo} &bull; ${inv.dateFormatted} &bull; <span class="pay-badge ${getPayBadgeClass(inv.paymentStatus)}">${getPayStatusLabel(inv.paymentStatus)}</span></div>
+          </div>
+          <div style="text-align:right;">
+            <div class="piutang-sisa">Rp ${(inv.amountRemaining || 0).toLocaleString('id-ID')}</div>
+            <button class="btn-secondary" style="padding:4px 10px; font-size:10px; margin-top:4px;" onclick="openCicilanModal('${inv.invNo}')">+ Cicilan</button>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function renderRecentFeed() {
+      const container = document.getElementById('recent-invoices-feed');
+      container.innerHTML = '';
+
+      if (database.length === 0) {
+        container.innerHTML = `
+          <div style="text-align:center; padding: 60px 20px; color:var(--gy); font-size:13px; display:flex; flex-direction:column; align-items:center;">
+            <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="margin-bottom:16px; opacity:0.4;"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+            Belum ada invoice dibuat.
+          </div>`;
+        return;
+      }
+
+      // Slice top 5
+      const recent = database.slice(0, 5);
+      recent.forEach(inv => {
+        const ps = inv.paymentStatus || 'lunas';
+        const div = document.createElement('div');
+        div.className = 'history-card';
+        div.innerHTML = `
+          <div class="hc-top">
+            <div class="hc-inv">${inv.invNo}</div>
+            <div class="hc-date">${inv.dateFormatted}</div>
+          </div>
+          <div class="hc-name">${inv.custName} <span class="pay-badge ${getPayBadgeClass(ps)}">${getPayStatusLabel(ps)}</span></div>
+          <div class="hc-items">${inv.items.map(x => `• ${x.name} (x${x.qty})`).join('<br>')}</div>
+          <div class="hc-bot">
+            <div class="hc-total">Rp ${inv.grandTotal.toLocaleString('id-ID')}</div>
+            <button class="btn-secondary" style="padding: 6px 12px; font-size:11px;" onclick="openPreviewFromFeed('${inv.invNo}')">🔍 Lihat Nota</button>
+          </div>
+        `;
+        container.appendChild(div);
+      });
+    }
+
+    // SEARCH & HISTORY TAB RENDERER
+    function renderHistoryList() {
+      const query = document.getElementById('history-search-input').value.toLowerCase().trim();
+      const container = document.getElementById('full-history-feed');
+      container.innerHTML = '';
+
+      // Filter based on search query + payment status filter
+      let filtered = database.filter(inv => {
+        const inInvNo = inv.invNo.toLowerCase().includes(query);
+        const inCustName = inv.custName.toLowerCase().includes(query);
+        const inImei = inv.items.some(item => item.imei && item.imei.toLowerCase().includes(query));
+        const inItemName = inv.items.some(item => item.name.toLowerCase().includes(query));
+        return inInvNo || inCustName || inImei || inItemName;
+      });
+
+      // Apply payment status filter
+      if (currentHistoryStatusFilter !== 'all') {
+        if (currentHistoryStatusFilter === 'belum_lunas') {
+          filtered = filtered.filter(inv => (inv.paymentStatus || 'lunas') !== 'lunas');
+        } else {
+          filtered = filtered.filter(inv => (inv.paymentStatus || 'lunas') === currentHistoryStatusFilter);
+        }
+      }
+
+      if (filtered.length === 0) {
         container.innerHTML = `<div style="text-align:center; padding:40px; color:var(--gy); font-size:13px;">Tidak menemukan transaksi cocok.</div>`;
         return;
       }
 
-      // Sort newest to oldest
-      filtered.sort((a, b) => {
-        const tA = new Date(a.dateVal).getTime();
-        const tB = new Date(b.dateVal).getTime();
-        return tB - tA;
-      });
-
-      // Group by Month-Year
-      const groups = {};
-      const monthsIndo = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
-      
-      const groupKeys = [];
-
       filtered.forEach(inv => {
-        const d = new Date(inv.dateVal);
-        const monthYear = `${monthsIndo[d.getMonth()]} ${d.getFullYear()}`;
-        if (!groups[monthYear]) {
-          groups[monthYear] = { invoices: [], total: 0 };
-          groupKeys.push(monthYear);
-        }
-        groups[monthYear].invoices.push(inv);
-        groups[monthYear].total += inv.grandTotal;
-      });
-
-      let html = '';
-      let isFirst = true;
-
-      groupKeys.forEach(monthYear => {
-        const data = groups[monthYear];
-        let cardsHtml = '';
-        
-        data.invoices.forEach(inv => {
-          const ps = inv.paymentStatus || 'lunas';
-          const isDebt = ps === 'dp' || ps === 'belum_bayar';
-          const debtSection = isDebt ? `
-            <div class="debt-info">
-              <div class="debt-info-col">
-                <div class="debt-info-lbl">Sudah Dibayar</div>
-                <div class="debt-info-val" style="color:#4ade80;">Rp ${(inv.amountPaid || 0).toLocaleString('id-ID')}</div>
-              </div>
-              <div class="debt-info-col">
-                <div class="debt-info-lbl">Sisa Tagihan</div>
-                <div class="debt-info-val" style="color:#f87171;">Rp ${(inv.amountRemaining || 0).toLocaleString('id-ID')}</div>
-              </div>
+        const ps = inv.paymentStatus || 'lunas';
+        const isDebt = ps === 'dp' || ps === 'belum_bayar';
+        const debtSection = isDebt ? `
+          <div class="debt-info">
+            <div class="debt-info-col">
+              <div class="debt-info-lbl">Sudah Dibayar</div>
+              <div class="debt-info-val" style="color:#4ade80;">Rp ${(inv.amountPaid || 0).toLocaleString('id-ID')}</div>
             </div>
-          ` : '';
-          const cicilanBtn = isDebt ? `<button class="hc-btn" style="background:rgba(247,147,26,0.15); color:var(--or); border:1px solid rgba(247,147,26,0.3);" onclick="openCicilanModal('${inv.invNo}')">💳</button>` : '';
-
-          cardsHtml += `
-            <div class="history-card">
-              <div class="hc-top">
-                <div class="hc-inv">${inv.invNo}</div>
-                <div class="hc-date">${inv.dateFormatted}</div>
-              </div>
-              <div class="hc-name" style="display:flex; align-items:center; gap:6px; flex-wrap:wrap;">
-                ${inv.custName}
-                <span class="pay-badge ${getPayBadgeClass(ps)}">${getPayStatusLabel(ps)}</span>
-              </div>
-              <div class="hc-items">${inv.items.map(x => `📦 ${x.name} (x${x.qty})`).join('<br>')}</div>
-              ${debtSection}
-              <div class="hc-bot">
-                <div class="hc-total">Rp ${inv.grandTotal.toLocaleString('id-ID')}</div>
-                <div class="hc-actions">
-                  ${cicilanBtn}
-                  <button class="hc-btn hc-btn-wa" onclick="shareToWhatsApp('${inv.invNo}')">
-                    <svg viewBox="0 0 24 24" fill="currentColor" style="width:16px;height:16px;">
-                      <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L0 24l6.335-1.662c1.746.953 3.71 1.455 5.703 1.456h.004c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/>
-                    </svg>
-                  </button>
-                  <button class="hc-btn" onclick="openPreviewFromFeed('${inv.invNo}')">📄</button>
-                  <button class="hc-btn hc-btn-del" onclick="deleteInvoiceFromHistory('${inv.invNo}')">🗑️</button>
-                </div>
-              </div>
+            <div class="debt-info-col">
+              <div class="debt-info-lbl">Sisa Tagihan</div>
+              <div class="debt-info-val" style="color:#f87171;">Rp ${(inv.amountRemaining || 0).toLocaleString('id-ID')}</div>
             </div>
-          `;
-        });
-
-        const safeId = monthYear.replace(/\s+/g, '-');
-        html += `
-          <div class="history-month-header ${isFirst ? 'open' : ''}" onclick="toggleHistoryAccordion('${safeId}')" id="hist-hdr-${safeId}">
-            <div>
-              <div style="font-size:14px;">${monthYear}</div>
-              <div style="font-size:11px; color:var(--gy); font-weight:400; margin-top:2px;">${data.invoices.length} Transaksi &bull; Rp ${data.total.toLocaleString('id-ID')}</div>
-            </div>
-            <svg class="chevron" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
           </div>
-          <div id="hist-acc-${safeId}" class="history-acc-content ${isFirst ? 'open' : ''}">
-            ${cardsHtml}
+        ` : '';
+        const cicilanBtn = isDebt ? `<button class="hc-btn" style="background:rgba(247,147,26,0.15); color:var(--or); border:1px solid rgba(247,147,26,0.3);" onclick="openCicilanModal('${inv.invNo}')">💰</button>` : '';
+
+        const div = document.createElement('div');
+        div.className = 'history-card';
+        div.innerHTML = `
+          <div class="hc-top">
+            <div class="hc-inv">${inv.invNo}</div>
+            <div class="hc-date">${inv.dateFormatted}</div>
+          </div>
+          <div class="hc-name" style="display:flex; align-items:center; gap:6px; flex-wrap:wrap;">
+            ${inv.custName}
+            <span class="pay-badge ${getPayBadgeClass(ps)}">${getPayStatusLabel(ps)}</span>
+          </div>
+          <div class="hc-items">${inv.items.map(x => `• ${x.name} (x${x.qty})`).join('<br>')}</div>
+          ${debtSection}
+          <div class="hc-bot">
+            <div class="hc-total">Rp ${inv.grandTotal.toLocaleString('id-ID')}</div>
+            <div class="hc-actions">
+              ${cicilanBtn}
+              <button class="hc-btn hc-btn-wa" onclick="shareToWhatsApp('${inv.invNo}')">
+                <svg viewBox="0 0 24 24" fill="currentColor" style="width:16px;height:16px;">
+                  <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L0 24l6.335-1.662c1.746.953 3.71 1.455 5.703 1.456h.004c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/>
+                </svg>
+              </button>
+              <button class="hc-btn" onclick="openPreviewFromFeed('${inv.invNo}')">🔍</button>
+              <button class="hc-btn hc-btn-del" onclick="deleteInvoiceFromHistory('${inv.invNo}')">🗑️</button>
+            </div>
           </div>
         `;
-        isFirst = false;
+        container.appendChild(div);
       });
-
-      container.innerHTML = html;
     }
 
     function openPreviewFromFeed(invNo) {
