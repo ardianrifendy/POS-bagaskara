@@ -5109,26 +5109,28 @@
             <html>
               <head>
                 <meta charset="utf-8">
-                <meta name="viewport" content="width=1000">
+                <meta name="viewport" content="width=device-width, initial-scale=1.0">
                 <title>Invoice</title>
                 ${stylesHtml}
                 <style>
                   @page { margin: 0; }
                   html, body { 
-                    background: #fff !important; 
+                    background: #ffffff !important; 
                     margin: 0 !important; 
                     padding: 0 !important; 
-                    width: 1000px !important; 
+                    width: 100% !important; 
+                    min-height: 100% !important;
                     color: #000 !important; 
                     font-family: Arial, sans-serif !important; 
                   }
                   .preview-box { 
+                    background: #ffffff !important;
                     box-shadow: none !important; 
                     border-radius: 0 !important; 
                     padding: 30px !important; 
                     margin: 0 !important; 
-                    width: 1000px !important; 
-                    max-width: 1000px !important; 
+                    width: 100% !important; 
+                    max-width: 100% !important; 
                     page-break-inside: avoid;
                   }
                   .no-print { display: none !important; }
