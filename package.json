@@ -10,12 +10,13 @@
   },
   "dependencies": {
     "@capacitor-community/contacts": "^5.1.1",
-    "@capacitor/android": "^5.7.0",
-    "@capacitor/core": "^5.7.0",
-    "@capacitor/filesystem": "^5.2.2",
-    "@capacitor/share": "^5.0.8"
+    "@capacitor/android": "^8.0.0",
+    "@capacitor/core": "^8.0.0",
+    "@capacitor/filesystem": "^8.0.0",
+    "@capacitor/share": "^8.0.0",
+    "@capgo/capacitor-printer": "^8.0.18"
   },
   "devDependencies": {
-    "@capacitor/cli": "^5.7.0"
+    "@capacitor/cli": "^8.0.0"
   }
 }

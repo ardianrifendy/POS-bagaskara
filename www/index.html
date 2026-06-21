@@ -5013,22 +5013,79 @@
       
       // Jika berjalan di dalam aplikasi Android (Capacitor)
       if (window.Capacitor) {
-        const data = currentPreviewData;
-        if (!data) return;
-        
-        const store = JSON.parse(localStorage.getItem('bagaskara_store_info')) || defaultStoreSettings;
-        const sellerSig = (sigPads.seller && !sigPadStates.seller) ? sigPads.seller.canvas.toDataURL() : null;
-        const printData = Object.assign({}, data, { sellerSignature: sellerSig });
-        
-        const encodedData = btoa(unescape(encodeURIComponent(JSON.stringify(printData))));
-        const encodedStore = btoa(unescape(encodeURIComponent(JSON.stringify(store))));
-        
-        const printUrl = `https://ardianrifendy.github.io/POS-bagaskara/print.html?d=${encodedData}&s=${encodedStore}`;
-        
-        setTimeout(() => {
-          // Buka di browser eksternal bawaan sistem (Chrome)
-          window.open(printUrl, '_blank');
-        }, 500);
+        showToast("Menyiapkan dokumen untuk dicetak...", false);
+        setTimeout(async () => {
+          const printArea = document.getElementById('print-area');
+          if (!printArea) return;
+          
+          // Klon area untuk dirender
+          const clone = printArea.cloneNode(true);
+          
+          // Kumpulkan CSS aktif
+          let stylesHtml = '';
+          document.querySelectorAll('style, link[rel="stylesheet"]').forEach(el => {
+            stylesHtml += el.outerHTML;
+          });
+          
+          // Pastikan signature seller dirender ulang di clone jika canvas digunakan
+          if (sigPads.seller && !sigPadStates.seller) {
+            const sellerImg = clone.querySelector('#prv-sig-seller');
+            if (sellerImg) sellerImg.src = sigPads.seller.canvas.toDataURL();
+          }
+          if (sigPads.buyer && !sigPadStates.buyer) {
+            const buyerImg = clone.querySelector('#prv-sig-buyer');
+            if (buyerImg) buyerImg.src = sigPads.buyer.canvas.toDataURL();
+          }
+          
+          // Rakit struktur HTML murni untuk dikirim ke Print Spooler Android
+          const htmlString = `
+            <!DOCTYPE html>
+            <html>
+              <head>
+                <meta charset="utf-8">
+                <meta name="viewport" content="width=1000">
+                <title>Invoice</title>
+                ${stylesHtml}
+                <style>
+                  @page { size: letter landscape; margin: 0.5cm; }
+                  body { background: #fff !important; margin: 0; padding: 0; width: 1000px !important; color: #000 !important; font-family: Arial, sans-serif !important; }
+                  .preview-box { box-shadow: none !important; border-radius: 0 !important; padding: 20px !important; margin: 0 !important; width: 1000px !important; max-width: 1000px !important; }
+                  .no-print { display: none !important; }
+                </style>
+              </head>
+              <body>
+                <div class="preview-box">${clone.innerHTML}</div>
+              </body>
+            </html>
+          `;
+          
+          const invName = currentPreviewData ? currentPreviewData.invNo.replace(/\//g, '-') : 'Invoice';
+          
+          try {
+            // Gunakan plugin Capacitor Printer
+            const { Printer } = Capacitor.Plugins;
+            if (Printer && Printer.printHtml) {
+              await Printer.printHtml({
+                html: htmlString,
+                name: invName
+              });
+            } else {
+              // Fallback Chrome
+              const data = currentPreviewData;
+              if (!data) return;
+              const store = JSON.parse(localStorage.getItem('bagaskara_store_info')) || defaultStoreSettings;
+              const sellerSig = (sigPads.seller && !sigPadStates.seller) ? sigPads.seller.canvas.toDataURL() : null;
+              const printData = Object.assign({}, data, { sellerSignature: sellerSig });
+              const encodedData = btoa(unescape(encodeURIComponent(JSON.stringify(printData))));
+              const encodedStore = btoa(unescape(encodeURIComponent(JSON.stringify(store))));
+              const printUrl = `https://ardianrifendy.github.io/POS-bagaskara/print.html?d=${encodedData}&s=${encodedStore}`;
+              window.open(printUrl, '_blank');
+            }
+          } catch(e) {
+            console.error("Print failed: ", e);
+            showToast("Gagal mencetak: " + e.message, true);
+          }
+        }, 300);
       } else {
         // Jika berjalan di browser PC biasa
         setTimeout(() => {

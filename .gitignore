@@ -11,3 +11,5 @@ android/capacitor-community-contacts/build/
 # OS files
 .DS_Store
 Thumbs.db
+jdk-21.0.2/ 
+jdk21.zip 
