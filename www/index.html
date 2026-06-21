@@ -2980,8 +2980,11 @@
     </div>
 
     <!-- FLOATING ACTIONS IN PREVIEW -->
-    <div class="action-row">
-      <button class="btn-print" onclick="printInvoiceNative()" style="width: 100%; font-weight: bold; font-size: 14px; padding: 14px; background: var(--or); border: none; border-radius: 12px; color: #fff; cursor: pointer;">
+    <div class="action-row" style="display: flex; gap: 10px;">
+      <button class="btn-secondary" onclick="editCurrentInvoice()" style="flex: 1; font-weight: bold; font-size: 14px; padding: 14px; border-radius: 12px; cursor: pointer;" data-i18n="Sunting Invoice">
+        📝 Sunting
+      </button>
+      <button class="btn-print" onclick="printInvoiceNative()" style="flex: 1; font-weight: bold; font-size: 14px; padding: 14px; background: var(--or); border: none; border-radius: 12px; color: #fff; cursor: pointer;">
         🖨️ Cetak Invoice
       </button>
     </div>
@@ -5431,6 +5434,86 @@
       }
     }
 
+    function editCurrentInvoice() {
+      if (!currentPreviewData) return;
+      const invNo = currentPreviewData.invNo;
+      const inv = database.find(x => x.invNo === invNo);
+      if (!inv) return;
+      
+      resetInvoiceForm();
+      
+      // Populate metadata
+      document.getElementById('inp-inv-no').value = inv.invNo;
+      document.getElementById('inp-inv-date').value = inv.dateVal;
+      
+      // Handle Date display
+      const d = new Date(inv.dateVal);
+      cdpSelectedDate = new Date(d);
+      document.getElementById('date-display').textContent = formatDateDisplay(cdpSelectedDate);
+      
+      document.getElementById('inp-cust-name').value = inv.custName;
+      document.getElementById('inp-cust-phone').value = inv.custPhone !== '-' ? inv.custPhone : '';
+      document.getElementById('inp-cust-address').value = inv.custAddress !== '-' ? inv.custAddress : '';
+      
+      // Select dropdown items
+      document.getElementById('inp-warranty-type').value = inv.warrantyType;
+      const wtTrigger = document.querySelector('[data-target="inp-warranty-type"]');
+      if (wtTrigger) {
+        const opt = document.querySelector(`[data-target="inp-warranty-type"] + .cs-dropdown .cs-option[data-value="${inv.warrantyType}"]`);
+        if (opt) wtTrigger.textContent = opt.textContent;
+      }
+      toggleWarrantyDuration();
+      document.getElementById('inp-warranty-dur').value = inv.warrantyDur || '1 Bulan';
+      
+      document.getElementById('inp-payment').value = inv.payment || 'Tunai';
+      const payTrigger = document.querySelector('[data-target="inp-payment"]');
+      if (payTrigger) {
+        const opt = document.querySelector(`[data-target="inp-payment"] + .cs-dropdown .cs-option[data-value="${inv.payment || 'Tunai'}"]`);
+        if (opt) payTrigger.textContent = opt.textContent;
+      }
+      
+      document.getElementById('inp-payment-status').value = inv.paymentStatus || 'lunas';
+      const psTrigger = document.querySelector('[data-target="inp-payment-status"]');
+      if (psTrigger) {
+        const opt = document.querySelector(`[data-target="inp-payment-status"] + .cs-dropdown .cs-option[data-value="${inv.paymentStatus || 'lunas'}"]`);
+        if (opt) psTrigger.textContent = opt.textContent;
+      }
+      
+      document.getElementById('inp-amount-paid').value = inv.amountPaid || '0';
+      document.getElementById('amount-paid-field').style.display = (inv.paymentStatus === 'dp') ? 'block' : 'none';
+      
+      document.getElementById('inp-discount').value = inv.discount || '0';
+      document.getElementById('inp-notes').value = inv.notes || '';
+      
+      // Populate items
+      document.getElementById('items-container').innerHTML = '';
+      itemIndex = 0;
+      
+      if (inv.items && inv.items.length > 0) {
+        inv.items.forEach(item => {
+          addItemField();
+          document.getElementById('item-name-' + itemIndex).value = item.name;
+          document.getElementById('item-qty-' + itemIndex).value = item.qty;
+          document.getElementById('item-price-' + itemIndex).value = item.price;
+          document.getElementById('item-subtotal-' + itemIndex).value = item.sub;
+          const row = document.getElementById('item-row-' + itemIndex);
+          if (item.productId) {
+            row.dataset.productId = item.productId;
+          }
+          if (item.imei) {
+            row.dataset.imei = item.imei;
+          }
+        });
+      } else {
+        addItemField();
+      }
+      
+      updateLiveTotal();
+      switchTab('form');
+      closePreviewModal();
+      showToast("Mode Edit Invoice Aktif", false);
+    }
+
     function deleteInvoiceFromHistory(invNo) {
       if (confirm(`Apakah Anda yakin ingin menghapus invoice ${invNo}? Tindakan ini tidak dapat dibatalkan.`)) {
         const inv = database.find(x => x.invNo === invNo);
@@ -6883,6 +6966,7 @@
     // ===== THEME & LANGUAGE LOCALIZATION MODULE =====
     const translations = {
       en: {
+        "Sunting Invoice": "Edit Invoice",
         "Beranda": "Home", "Riwayat": "History", "Invoice": "Invoice", "Produk": "Products", "Setelan": "Settings",
         "Invoices Hari Ini": "Invoices Today", "Omset Hari Ini": "Today's Revenue", "Total Stok Ready": "Total Ready Stock",
         "Nilai Inventori (Modal)": "Inventory Value (Capital)", "Total Database Transaksi": "Total Database Size",
