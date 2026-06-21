@@ -57,7 +57,8 @@ with open(csv_file, 'r', encoding='utf-8-sig') as f:
             "variant_name": varian_name,
             "price": price,
             "stock": stok,
-            "status": status_stok
+            "status": status_stok,
+            "image": image
         })
 
 # Process min/max prices and sort
