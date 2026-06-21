@@ -20,16 +20,16 @@
         <item name="android:alertDialogTheme">@style/DarkAlertDialog</item>
     </style>
 
-    <!-- Dark Date Picker matching the orange theme -->
-    <style name="DarkDatePickerDialog" parent="Theme.AppCompat.DayNight.Dialog">
+    <!-- Light Date Picker matching the orange theme -->
+    <style name="DarkDatePickerDialog" parent="Theme.AppCompat.Light.Dialog">
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
         <item name="android:headerBackground">@color/colorPrimary</item>
     </style>
 
-    <!-- Dark Alert / Select Dialog -->
-    <style name="DarkAlertDialog" parent="Theme.AppCompat.DayNight.Dialog.Alert">
+    <!-- Light Alert / Select Dialog to ensure text is visible -->
+    <style name="DarkAlertDialog" parent="Theme.AppCompat.Light.Dialog.Alert">
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
