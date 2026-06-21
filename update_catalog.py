@@ -2,7 +2,7 @@ import csv
 import json
 import re
 
-csv_file = 'UPDATE BESAR.csv'
+csv_file = 'update.csv'
 js_file = 'www/phone-catalog.js'
 
 catalog_dict = {}
@@ -38,7 +38,15 @@ with open(csv_file, 'r', encoding='utf-8-sig') as f:
         stok = int(stok_str) if stok_str.isdigit() else 0
         status_stok = row.get('Status_Stok', '').strip()
         varian_name = row.get('Varian', '').strip()
+        
+        # Determine best image
         image = row.get('Link_Gambar', '').strip()
+        image_urls_raw = row.get('Image_URLs', '').strip()
+        if image_urls_raw:
+            # Get the first URL in the comma-separated list
+            first_url = image_urls_raw.split(',')[0].strip()
+            if first_url:
+                image = first_url
         
         # Intelligent Extraction for un-split catalog items
         if warna in ('', '-') and kapasitas in ('', '-'):
