@@ -40,6 +40,26 @@ with open(csv_file, 'r', encoding='utf-8-sig') as f:
         varian_name = row.get('Varian', '').strip()
         image = row.get('Link_Gambar', '').strip()
         
+        # Intelligent Extraction for un-split catalog items
+        if warna in ('', '-') and kapasitas in ('', '-'):
+            if ' - ' in nama:
+                parts = nama.rsplit(' - ', 1)
+                nama = parts[0].strip()
+                warna = parts[1].strip()
+            
+            cap_match = re.search(r'\s(\d+/(?:\d+\.)?\d+[A-Za-z]+|\d+[A-Za-z]+)$', nama)
+            if cap_match:
+                kapasitas = cap_match.group(1)
+                nama = nama[:cap_match.start()].strip()
+            
+            # Reconstruct variant_name for clarity
+            if warna != '-' and kapasitas != '-':
+                varian_name = f"{kapasitas},{warna}"
+            elif warna != '-':
+                varian_name = warna
+            elif kapasitas != '-':
+                varian_name = kapasitas
+        
         # Initialize base model if not exists
         if nama not in catalog_dict:
             catalog_dict[nama] = {
