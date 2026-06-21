@@ -2444,6 +2444,7 @@
                   <div class="cs-option active" data-value="none">Tanpa Garansi</div>
                   <div class="cs-option" data-value="personal">Garansi Personal (Toko)</div>
                   <div class="cs-option" data-value="resmi">Garansi Resmi Brand</div>
+                  <div class="cs-option" data-value="both">Garansi Toko & Resmi Brand</div>
                 </div>
               </div>
             </div>
@@ -3165,6 +3166,7 @@
               <div class="cs-option active" data-value="none">Tanpa Garansi</div>
               <div class="cs-option" data-value="personal">Garansi Personal (Toko)</div>
               <div class="cs-option" data-value="resmi">Garansi Resmi Brand</div>
+              <div class="cs-option" data-value="both">Garansi Toko & Resmi Brand</div>
             </div>
           </div>
         </div>
@@ -4555,7 +4557,7 @@
           document.getElementById('prod-warranty-type').value = p.warrantyType || 'none';
           
           // Set dropdown warranty type
-          const wName = p.warrantyType === 'personal' ? 'Garansi Personal (Toko)' : (p.warrantyType === 'resmi' ? 'Garansi Resmi Brand' : 'Tanpa Garansi');
+          const wName = p.warrantyType === 'personal' ? 'Garansi Personal (Toko)' : (p.warrantyType === 'resmi' ? 'Garansi Resmi Brand' : (p.warrantyType === 'both' ? 'Garansi Toko & Resmi Brand' : 'Tanpa Garansi'));
           document.querySelector('#product-modal [data-target="prod-warranty-type"]').textContent = wName;
           
           document.getElementById('prod-imei').value = p.imei || '';
@@ -5534,6 +5536,8 @@
         badgeContainer.innerHTML = `<span class="badge badge-gn">Garansi Personal Toko (${invoiceData.warrantyDur})</span>`;
       } else if (invoiceData.warrantyType === 'resmi') {
         badgeContainer.innerHTML = `<span class="badge badge-or">Garansi Resmi Brand (${invoiceData.warrantyDur})</span>`;
+      } else if (invoiceData.warrantyType === 'both') {
+        badgeContainer.innerHTML = `<span class="badge badge-gn" style="margin-right:5px;">Garansi Personal Toko (${invoiceData.warrantyDur})</span><span class="badge badge-or">Garansi Resmi Brand (${invoiceData.warrantyDur})</span>`;
       }
 
       // Notes
