@@ -383,15 +383,91 @@
     }
     .tab-content {
       display: none;
+      /* default fallback animation */
       animation: fadeIn 0.35s cubic-bezier(0.4, 0, 0.2, 1);
     }
     .tab-content.active {
       display: block;
     }
+    .tab-content.active.slide-left {
+      animation: slideInLeft 0.3s cubic-bezier(0.25, 1, 0.5, 1);
+    }
+    .tab-content.active.slide-right {
+      animation: slideInRight 0.3s cubic-bezier(0.25, 1, 0.5, 1);
+    }
 
     @keyframes fadeIn {
       from { opacity: 0; transform: translateY(12px); }
       to { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes slideInRight {
+      from { opacity: 0; transform: translateX(30px); }
+      to { opacity: 1; transform: translateX(0); }
+    }
+    @keyframes slideInLeft {
+      from { opacity: 0; transform: translateX(-30px); }
+      to { opacity: 1; transform: translateX(0); }
+    }
+
+    /* CHART STYLES */
+    .chart-container {
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      height: 140px;
+      margin-top: 10px;
+      padding-top: 20px;
+      gap: 6px;
+    }
+    .chart-col {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-end;
+      height: 100%;
+    }
+    .chart-bar-wrapper {
+      width: 100%;
+      height: 100%;
+      display: flex;
+      align-items: flex-end;
+      justify-content: center;
+      position: relative;
+    }
+    .chart-bar {
+      width: 80%;
+      max-width: 24px;
+      background: var(--or);
+      border-radius: 4px 4px 0 0;
+      transition: height 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+      height: 0%; /* Dynamic */
+    }
+    .chart-label {
+      font-size: 9.5px;
+      color: var(--gy);
+      margin-top: 6px;
+      text-transform: uppercase;
+      font-weight: 600;
+    }
+    .chart-val-tooltip {
+      position: absolute;
+      top: -22px;
+      font-size: 9px;
+      font-weight: 700;
+      color: #fff;
+      background: var(--bk);
+      padding: 2px 6px;
+      border-radius: 4px;
+      border: 1px solid rgba(255,255,255,0.1);
+      opacity: 0;
+      transition: opacity 0.2s;
+      pointer-events: none;
+      white-space: nowrap;
+      z-index: 5;
+    }
+    .chart-col:hover .chart-val-tooltip, .chart-col:active .chart-val-tooltip {
+      opacity: 1;
     }
 
     /* STATS GRID */
@@ -3343,14 +3419,28 @@
     };
 
     // SYSTEM CONTROLLER: BOTTOM NAV TAB SWITCH
+    const tabOrder = { 'dashboard': 0, 'history': 1, 'form': 2, 'products': 3, 'katalog': 4, 'settings': 5 };
+
     function switchTab(tabId) {
+      const oldIndex = tabOrder[currentTab];
+      const newIndex = tabOrder[tabId];
+      let directionClass = 'slide-left';
+      if (newIndex < oldIndex) {
+        directionClass = 'slide-right';
+      }
+
       // Hide active tab content
-      document.getElementById(`tab-${currentTab}`).classList.remove('active');
+      const oldTab = document.getElementById(`tab-${currentTab}`);
+      oldTab.classList.remove('active', 'slide-left', 'slide-right');
       const oldNav = document.getElementById(`nav-${currentTab}`);
       if (oldNav) oldNav.classList.remove('active');
 
       // Show new tab content
-      document.getElementById(`tab-${tabId}`).classList.add('active');
+      const newTab = document.getElementById(`tab-${tabId}`);
+      newTab.classList.remove('slide-left', 'slide-right');
+      void newTab.offsetWidth; // trigger reflow
+      newTab.classList.add('active', directionClass);
+      
       const newNav = document.getElementById(`nav-${tabId}`);
       if (newNav) newNav.classList.add('active');
 
@@ -3364,6 +3454,7 @@
 
       // Special triggers
       if (tabId === 'dashboard') {
+        renderDashboardChart();
         updateDashboardStats();
         renderLaporanTab();
       } else if (tabId === 'history') {
