@@ -20,7 +20,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Ubuntu:wght@300;400;500;700&display=swap" rel="stylesheet">
   
   <style>
-    :root {
+    :root, [data-theme="dark-default"] {
       --or: #F7931A;
       --or-d: #d97706;
       --or-bg: #fff7ed;
@@ -38,6 +38,126 @@
       --rd-bd: #fee2e2;
       --white: #ffffff;
       color-scheme: dark;
+    }
+
+    [data-theme="dark-ocean"] {
+      --or: #0ea5e9;
+      --or-d: #0284c7;
+      --or-bg: #f0f9ff;
+      --or-bd: #bae6fd;
+      --bk: #0f172a;
+      --bk2: #1e293b;
+      --bk3: #334155;
+      --gy: #94a3b8;
+      --gy-bg: #1e293b;
+      --gn: #10b981;
+      --gn-bg: #ecfdf5;
+      --gn-bd: #a7f3d0;
+      --rd: #ef4444;
+      --rd-bg: #fef2f2;
+      --rd-bd: #fca5a5;
+      --white: #f8fafc;
+      color-scheme: dark;
+    }
+
+    [data-theme="dark-dracula"] {
+      --or: #ff79c6;
+      --or-d: #d53f8c;
+      --or-bg: #fae8ff;
+      --or-bd: #fbcfe8;
+      --bk: #282a36;
+      --bk2: #44475a;
+      --bk3: #6272a4;
+      --gy: #f8f8f2;
+      --gy-bg: #44475a;
+      --gn: #50fa7b;
+      --gn-bg: #ecfdf5;
+      --gn-bd: #a7f3d0;
+      --rd: #ff5555;
+      --rd-bg: #fef2f2;
+      --rd-bd: #fca5a5;
+      --white: #f8f8f2;
+      color-scheme: dark;
+    }
+
+    [data-theme="dark-matrix"] {
+      --or: #10b981;
+      --or-d: #059669;
+      --or-bg: #ecfdf5;
+      --or-bd: #a7f3d0;
+      --bk: #000000;
+      --bk2: #09090b;
+      --bk3: #27272a;
+      --gy: #a1a1aa;
+      --gy-bg: #18181b;
+      --gn: #22c55e;
+      --gn-bg: #f0fdf4;
+      --gn-bd: #bbf7d0;
+      --rd: #ef4444;
+      --rd-bg: #fef2f2;
+      --rd-bd: #fca5a5;
+      --white: #ffffff;
+      color-scheme: dark;
+    }
+
+    [data-theme="light-default"] {
+      --or: #F7931A;
+      --or-d: #d97706;
+      --or-bg: #fff7ed;
+      --or-bd: #fed7aa;
+      --bk: #f4f5f7;
+      --bk2: #ffffff;
+      --bk3: #edf0f5;
+      --gy: #6b7280;
+      --gy-bg: #f3f4f6;
+      --gn: #22c55e;
+      --gn-bg: #f0fdf4;
+      --gn-bd: #bbf7d0;
+      --rd: #ef4444;
+      --rd-bg: #fef2f2;
+      --rd-bd: #fee2e2;
+      --white: #111827;
+      color-scheme: light;
+    }
+
+    [data-theme="light-breeze"] {
+      --or: #0ea5e9;
+      --or-d: #0284c7;
+      --or-bg: #e0f2fe;
+      --or-bd: #bae6fd;
+      --bk: #f0f9ff;
+      --bk2: #ffffff;
+      --bk3: #e0f2fe;
+      --gy: #64748b;
+      --gy-bg: #f1f5f9;
+      --gn: #10b981;
+      --gn-bg: #ecfdf5;
+      --gn-bd: #a7f3d0;
+      --rd: #ef4444;
+      --rd-bg: #fef2f2;
+      --rd-bd: #fca5a5;
+      --white: #0f172a;
+      color-scheme: light;
+    }
+
+    [data-theme="light-rose"] {
+      --or: #e11d48;
+      --or-d: #be123c;
+      --or-bg: #ffe4e6;
+      --or-bd: #fecdd3;
+      --bk: #fff1f2;
+      --bk2: #ffffff;
+      --bk3: #ffe4e6;
+      --gy: #881337;
+      --gy-bg: #f3f4f6;
+      --gn: #10b981;
+      --gn-bg: #ecfdf5;
+      --gn-bd: #a7f3d0;
+      --rd: #ef4444;
+      --rd-bg: #fef2f2;
+      --rd-bd: #fca5a5;
+      --white: #4c0519;
+      color-scheme: light;
     }
 
     html {
@@ -1769,7 +1889,7 @@
     }
 
     /* LIGHT MODE STYLES OVERRIDES */
-    body.light-theme {
+    body[data-theme*="light"] {
       --bk: #f4f5f7;
       --bk2: #ffffff;
       --bk3: #edf0f5;
@@ -1780,100 +1900,100 @@
       background-color: var(--bk);
       color: #1f2937;
     }
-    body.light-theme .topbar {
+    body[data-theme*="light"] .topbar {
       background: linear-gradient(135deg, var(--bk2), var(--bk));
       box-shadow: 0 4px 20px rgba(0,0,0,0.06);
       border-bottom: 1px solid var(--bk3);
     }
-    body.light-theme .bottom-nav {
+    body[data-theme*="light"] .bottom-nav {
       background: rgba(255, 255, 255, 0.85);
       border-color: rgba(0, 0, 0, 0.08);
       box-shadow: 0 8px 32px rgba(0,0,0,0.08);
     }
-    body.light-theme .tb-greeting,
-    body.light-theme .settings-profile-card,
-    body.light-theme .settings-menu-list,
-    body.light-theme .settings-subpage-overlay,
-    body.light-theme .subpage-header,
-    body.light-theme .card,
-    body.light-theme .stat-card,
-    body.light-theme .step-header,
-    body.light-theme .live-banner,
-    body.light-theme .product-card,
-    body.light-theme .history-card,
-    body.light-theme .pm-card,
-    body.light-theme .cicilan-sheet,
-    body.light-theme .autocomplete-suggestions,
-    body.light-theme .cs-dropdown,
-    body.light-theme .cdp-card {
+    body[data-theme*="light"] .tb-greeting,
+    body[data-theme*="light"] .settings-profile-card,
+    body[data-theme*="light"] .settings-menu-list,
+    body[data-theme*="light"] .settings-subpage-overlay,
+    body[data-theme*="light"] .subpage-header,
+    body[data-theme*="light"] .card,
+    body[data-theme*="light"] .stat-card,
+    body[data-theme*="light"] .step-header,
+    body[data-theme*="light"] .live-banner,
+    body[data-theme*="light"] .product-card,
+    body[data-theme*="light"] .history-card,
+    body[data-theme*="light"] .pm-card,
+    body[data-theme*="light"] .cicilan-sheet,
+    body[data-theme*="light"] .autocomplete-suggestions,
+    body[data-theme*="light"] .cs-dropdown,
+    body[data-theme*="light"] .cdp-card {
       background: var(--bk2) !important;
       color: var(--white) !important;
       border-color: rgba(0, 0, 0, 0.08) !important;
     }
-    body.light-theme input,
-    body.light-theme select,
-    body.light-theme textarea,
-    body.light-theme .cs-trigger,
-    body.light-theme .cdp-day:not(.empty),
-    body.light-theme .cicilan-history,
-    body.light-theme .btn-print,
-    body.light-theme .btn-close-prv,
-    body.light-theme .btn-icon,
-    body.light-theme .spec-item {
+    body[data-theme*="light"] input,
+    body[data-theme*="light"] select,
+    body[data-theme*="light"] textarea,
+    body[data-theme*="light"] .cs-trigger,
+    body[data-theme*="light"] .cdp-day:not(.empty),
+    body[data-theme*="light"] .cicilan-history,
+    body[data-theme*="light"] .btn-print,
+    body[data-theme*="light"] .btn-close-prv,
+    body[data-theme*="light"] .btn-icon,
+    body[data-theme*="light"] .spec-item {
       background-color: var(--bk3) !important;
       color: var(--white) !important;
       border-color: rgba(0, 0, 0, 0.1) !important;
     }
 
-    body.light-theme .profit-card,
-    body.light-theme .expense-card {
+    body[data-theme*="light"] .profit-card,
+    body[data-theme*="light"] .expense-card {
       background: var(--bk2);
       border-color: rgba(0, 0, 0, 0.08);
     }
-    body.light-theme .profit-card.highlight-gn { border-color: rgba(22,163,74,0.4); background: rgba(22,163,74,0.06); }
-    body.light-theme .profit-card.highlight-rd { border-color: rgba(220,38,38,0.3); background: rgba(220,38,38,0.05); }
-    body.light-theme .profit-card.highlight-or { border-color: rgba(217,119,6,0.3); background: rgba(217,119,6,0.05); }
-    body.light-theme .profit-val { color: var(--white); }
-    body.light-theme .profit-val.gn, body.light-theme .mini-stat-val.gn { color: #16a34a !important; }
-    body.light-theme .profit-val.rd, body.light-theme .expense-amt, body.light-theme .mini-stat-val.rd { color: #dc2626 !important; }
-    body.light-theme .profit-val.or, body.light-theme .mini-stat-val.or { color: #d97706 !important; }
-    body.light-theme .expense-cat { color: var(--white); }
-    body.light-theme .stat-val,
-    body.light-theme .card-title,
-    body.light-theme .step-title,
-    body.light-theme .live-val,
-    body.light-theme .prod-title,
-    body.light-theme .hc-inv,
-    body.light-theme .hc-name,
-    body.light-theme .piutang-name,
-    body.light-theme .cicilan-title,
-    body.light-theme .btn-back-settings,
-    body.light-theme .btn-close-prv,
-    body.light-theme .pm-title,
-    body.light-theme .price-val.buy,
-    body.light-theme .suggestion-item,
-    body.light-theme .cs-option {
+    body[data-theme*="light"] .profit-card.highlight-gn { border-color: rgba(22,163,74,0.4); background: rgba(22,163,74,0.06); }
+    body[data-theme*="light"] .profit-card.highlight-rd { border-color: rgba(220,38,38,0.3); background: rgba(220,38,38,0.05); }
+    body[data-theme*="light"] .profit-card.highlight-or { border-color: rgba(217,119,6,0.3); background: rgba(217,119,6,0.05); }
+    body[data-theme*="light"] .profit-val { color: var(--white); }
+    body[data-theme*="light"] .profit-val.gn, body[data-theme*="light"] .mini-stat-val.gn { color: #16a34a !important; }
+    body[data-theme*="light"] .profit-val.rd, body[data-theme*="light"] .expense-amt, body[data-theme*="light"] .mini-stat-val.rd { color: #dc2626 !important; }
+    body[data-theme*="light"] .profit-val.or, body[data-theme*="light"] .mini-stat-val.or { color: #d97706 !important; }
+    body[data-theme*="light"] .expense-cat { color: var(--white); }
+    body[data-theme*="light"] .stat-val,
+    body[data-theme*="light"] .card-title,
+    body[data-theme*="light"] .step-title,
+    body[data-theme*="light"] .live-val,
+    body[data-theme*="light"] .prod-title,
+    body[data-theme*="light"] .hc-inv,
+    body[data-theme*="light"] .hc-name,
+    body[data-theme*="light"] .piutang-name,
+    body[data-theme*="light"] .cicilan-title,
+    body[data-theme*="light"] .btn-back-settings,
+    body[data-theme*="light"] .btn-close-prv,
+    body[data-theme*="light"] .pm-title,
+    body[data-theme*="light"] .price-val.buy,
+    body[data-theme*="light"] .suggestion-item,
+    body[data-theme*="light"] .cs-option {
       color: var(--white) !important;
     }
-    body.light-theme .settings-menu-item:hover,
-    body.light-theme .suggestion-item:hover,
-    body.light-theme .cs-option:hover {
+    body[data-theme*="light"] .settings-menu-item:hover,
+    body[data-theme*="light"] .suggestion-item:hover,
+    body[data-theme*="light"] .cs-option:hover {
       background: rgba(0, 0, 0, 0.04) !important;
     }
-    body.light-theme .settings-menu-item div[style*="color: #fff"],
-    body.light-theme .settings-profile-card div[style*="color: #fff"],
-    body.light-theme #settings-profile-name {
+    body[data-theme*="light"] .settings-menu-item div[style*="color: #fff"],
+    body[data-theme*="light"] .settings-profile-card div[style*="color: #fff"],
+    body[data-theme*="light"] #settings-profile-name {
       color: var(--white) !important;
     }
-    body.light-theme .menu-icon-wrapper {
+    body[data-theme*="light"] .menu-icon-wrapper {
       background: rgba(247, 147, 26, 0.08) !important;
     }
-    body.light-theme .btn-secondary {
+    body[data-theme*="light"] .btn-secondary {
       background: #f3f4f6 !important;
       color: #1f2937 !important;
       border: 1px solid #d1d5db !important;
     }
-    body.light-theme .btn-secondary:hover {
+    body[data-theme*="light"] .btn-secondary:hover {
       background: #e5e7eb !important;
     }
   </style>
@@ -2413,19 +2533,15 @@
         </div>
 
         <!-- Tema / Theme -->
-        <div class="settings-menu-item" style="border-top: 1px solid rgba(255,255,255,0.03); cursor: default;">
+        <div class="settings-menu-item" onclick="openSettingsSubPage('tema')" style="border-top: 1px solid rgba(255,255,255,0.03);">
           <div class="menu-icon-wrapper">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
           </div>
           <div style="flex: 1;">
-            <div style="font-size: 14px; font-weight: 700; color: #fff;">Tema / Theme</div>
-            <div style="font-size: 11.5px; color: var(--gy); margin-top: 2px;">Gelap / Terang (Dark / Light Mode)</div>
+            <div style="font-size: 14px; font-weight: 700; color: #fff;">Tema / Theme (VS Code)</div>
+            <div style="font-size: 11.5px; color: var(--gy); margin-top: 2px;">Pilih 7 varian tema Gelap & Terang</div>
           </div>
-          <!-- Segmented Toggle -->
-          <div class="theme-toggle-group" style="display: flex; background: var(--bk3); border-radius: 8px; padding: 2px; width: 90px; height: 32px; box-sizing: border-box; align-self: center;">
-            <button id="theme-btn-dark" onclick="setThemeInline('dark')" style="flex: 1; height: 100%; border: none; background: var(--or); color: #000; font-size: 12px; font-weight: 700; border-radius: 6px; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; justify-content: center; padding: 0;">🌙</button>
-            <button id="theme-btn-light" onclick="setThemeInline('light')" style="flex: 1; height: 100%; border: none; background: transparent; color: var(--gy); font-size: 12px; font-weight: 700; border-radius: 6px; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; justify-content: center; padding: 0;">☀️</button>
-          </div>
+          <span style="color: var(--gy); font-size: 12px;">➔</span>
         </div>
       </div>
     </div>
@@ -2583,6 +2699,40 @@
             <input type="file" id="catalog-import-file" accept=".csv" style="display:none;" onchange="importCatalogFromCSV(event)">
             <button class="btn-danger" onclick="resetCatalogToDefault()" style="width:100%; background:rgba(239,68,68,0.1); color:#f87171; border:1px solid rgba(239,68,68,0.25); margin-top: 8px;">
               🗑️ Reset Katalog ke Default
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- SECTION: Tema (VS Code Themes) -->
+      <div id="sub-sect-tema" class="settings-sub-section" style="display: none;">
+        <div class="card" style="margin-bottom: 0;">
+          <div class="card-title" style="margin-bottom:16px;">Mode Gelap (Dark Themes)</div>
+          <div style="display:flex; flex-direction:column; gap:10px; margin-bottom: 24px;">
+            <button class="btn-secondary" onclick="applyTheme('dark-default')" style="justify-content:flex-start; text-align:left;">
+              <span style="display:inline-block; width:14px; height:14px; border-radius:50%; background:#F7931A; margin-right:10px;"></span> 🌙 Default (Bitcoin Orange)
+            </button>
+            <button class="btn-secondary" onclick="applyTheme('dark-ocean')" style="justify-content:flex-start; text-align:left;">
+              <span style="display:inline-block; width:14px; height:14px; border-radius:50%; background:#0ea5e9; margin-right:10px;"></span> 🌊 Oceanic Night (Biru)
+            </button>
+            <button class="btn-secondary" onclick="applyTheme('dark-dracula')" style="justify-content:flex-start; text-align:left;">
+              <span style="display:inline-block; width:14px; height:14px; border-radius:50%; background:#ff79c6; margin-right:10px;"></span> 🧛 Dracula (Pink/Ungu)
+            </button>
+            <button class="btn-secondary" onclick="applyTheme('dark-matrix')" style="justify-content:flex-start; text-align:left;">
+              <span style="display:inline-block; width:14px; height:14px; border-radius:50%; background:#10b981; margin-right:10px;"></span> 💻 Matrix Hacker (Hijau Neon)
+            </button>
+          </div>
+
+          <div class="card-title" style="margin-bottom:16px;">Mode Terang (Light Themes)</div>
+          <div style="display:flex; flex-direction:column; gap:10px;">
+            <button class="btn-secondary" onclick="applyTheme('light-default')" style="justify-content:flex-start; text-align:left;">
+              <span style="display:inline-block; width:14px; height:14px; border-radius:50%; background:#F7931A; margin-right:10px;"></span> ☀️ Default Light (Orange)
+            </button>
+            <button class="btn-secondary" onclick="applyTheme('light-breeze')" style="justify-content:flex-start; text-align:left;">
+              <span style="display:inline-block; width:14px; height:14px; border-radius:50%; background:#0ea5e9; margin-right:10px;"></span> 🌬️ Light Breeze (Biru Langit)
+            </button>
+            <button class="btn-secondary" onclick="applyTheme('light-rose')" style="justify-content:flex-start; text-align:left;">
+              <span style="display:inline-block; width:14px; height:14px; border-radius:50%; background:#e11d48; margin-right:10px;"></span> 🌸 Rose Gold (Merah Jambu)
             </button>
           </div>
         </div>
@@ -3112,8 +3262,8 @@
     // INITIALIZATION
     window.onload = function() {
       // Load and apply theme
-      const savedTheme = localStorage.getItem('bagaskara_theme') || 'dark';
-      applyThemeInline(savedTheme);
+      const savedTheme = localStorage.getItem('bagaskara_theme_v2') || 'dark-default';
+      document.body.setAttribute('data-theme', savedTheme);
 
       // Apply UI Scale
       applyZoom();
@@ -6720,28 +6870,10 @@
       showToast(lang === 'id' ? '🌐 ID — Bahasa Indonesia aktif' : '🌐 EN — English active');
     }
 
-    function applyThemeInline(theme) {
-      const btnDark = document.getElementById('theme-btn-dark');
-      const btnLight = document.getElementById('theme-btn-light');
-      if (theme === 'light') {
-        document.body.classList.add('light-theme');
-        localStorage.setItem('bagaskara_theme', 'light');
-        if (btnLight && btnDark) {
-          btnLight.style.background = 'var(--or)';
-          btnLight.style.color = '#000';
-          btnDark.style.background = 'transparent';
-          btnDark.style.color = 'var(--gy)';
-        }
-      } else {
-        document.body.classList.remove('light-theme');
-        localStorage.setItem('bagaskara_theme', 'dark');
-        if (btnLight && btnDark) {
-          btnDark.style.background = 'var(--or)';
-          btnDark.style.color = '#000';
-          btnLight.style.background = 'transparent';
-          btnLight.style.color = 'var(--gy)';
-        }
-      }
+    function applyTheme(themeName) {
+      document.body.setAttribute('data-theme', themeName);
+      localStorage.setItem('bagaskara_theme_v2', themeName);
+      showToast('🎨 Tema diterapkan');
     }
 
     function updateClock() {
@@ -6769,10 +6901,7 @@
       applyZoom();
     }
 
-    function setThemeInline(theme) {
-      applyThemeInline(theme);
-      showToast(theme === 'light' ? '☀️ Mode Terang aktif' : '🌙 Mode Gelap aktif');
-    }
+    // Deprecated setThemeInline, removed.
 
     // Register Service Worker for PWA
     if ('serviceWorker' in navigator) {
