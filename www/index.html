@@ -1136,9 +1136,9 @@
       gap: 12px;
     }
     .history-card {
-      background: var(--bk2);
+      background: var(--bk3);
       border: 1px solid rgba(255,255,255,0.05);
-      border-radius: 18px;
+      border-radius: 14px;
       padding: 14px;
       margin-bottom: 8px;
       position: relative;
@@ -2099,21 +2099,21 @@
 
     /* HISTORY ACCORDION */
     .history-month-group {
-      background: rgba(255,255,255,0.03);
+      background: var(--bk2);
       border: 1px solid rgba(255,255,255,0.05);
       border-radius: 18px;
       margin-bottom: 16px;
-      padding: 6px;
+      padding: 8px;
     }
     body[data-theme*="light"] .history-month-group {
       background: rgba(0,0,0,0.03);
       border-color: rgba(0,0,0,0.05);
     }
     .history-month-header {
-      background: rgba(255,255,255,0.05);
-      padding: 14px 16px;
+      background: transparent;
+      padding: 10px 12px;
       border-radius: 12px;
-      margin-bottom: 10px;
+      margin-bottom: 0;
       display: flex;
       justify-content: space-between;
       align-items: center;
@@ -2122,10 +2122,10 @@
       font-size: 14px;
       color: var(--white);
       transition: background 0.2s;
-      border: 1px solid rgba(255,255,255,0.08);
+      border: none;
     }
     .history-month-header:active {
-      background: rgba(255,255,255,0.08);
+      background: rgba(255,255,255,0.05);
     }
     .history-month-header .chevron {
       transition: transform 0.3s;
@@ -2143,7 +2143,7 @@
     .history-acc-content.open {
       max-height: 4000px;
       opacity: 1;
-      padding-bottom: 12px;
+      padding-top: 8px;
     }
     .acc-chevron {
       transition: transform 0.3s ease;
