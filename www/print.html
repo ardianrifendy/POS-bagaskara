@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <title>Cetak Invoice - Bagaskara Cell</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+    
+    :root {
+      --or: #f7931a;
+      --or-bg: rgba(247, 147, 26, 0.05);
+      --or-bd: rgba(247, 147, 26, 0.2);
+      --or-d: #d87d0f;
+    }
+    
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Inter', Arial, sans-serif;
+    }
+    
+    body {
+      background: #f5f5f5;
+      padding: 20px;
+      display: flex;
+      justify-content: center;
+    }
+
+    /* Kertas Cetak */
+    .print-container {
+      background: #fff;
+      width: 100%;
+      max-width: 1000px; /* Lebar optimal untuk Landscape Letter */
+      padding: 30px;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+      border-radius: 8px;
+    }
+
+    @media print {
+      body { background: #fff; padding: 0; }
+      .print-container { box-shadow: none; padding: 0; max-width: none; }
+      @page { size: letter landscape; margin: 0.2in; }
+    }
+
+    .inv-header {
+      background: #1a1a1a;
+      color: #fff;
+      border-radius: 12px;
+      padding: 16px 20px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      margin-bottom: 16px;
+    }
+    .inv-logo-box {
+      height: 54px;
+      width: 54px;
+      object-fit: contain;
+      background: #1a1a1a;
+      padding: 2px;
+      border-radius: 8px;
+    }
+    .inv-store-info { flex: 1; }
+    .inv-store-name {
+      font-size: 20px;
+      font-weight: 800;
+      color: var(--or);
+      letter-spacing: 0.5px;
+    }
+    .inv-store-detail {
+      font-size: 11px;
+      color: #ccc;
+      line-height: 1.5;
+      margin-top: 4px;
+    }
+    .inv-title-badge {
+      background: var(--or);
+      color: #fff;
+      padding: 6px 14px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 800;
+      letter-spacing: 0.5px;
+    }
+    .stripe {
+      height: 4px;
+      background: linear-gradient(90deg, var(--or), var(--or-d), var(--or));
+      margin-bottom: 16px;
+    }
+    .meta-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      margin-bottom: 20px;
+    }
+    .meta-box {
+      background: var(--or-bg);
+      border: 1.5px solid var(--or-bd);
+      border-radius: 8px;
+      padding: 12px 16px;
+    }
+    .meta-lbl {
+      font-size: 10px;
+      font-weight: 800;
+      color: var(--or-d);
+      text-transform: uppercase;
+      letter-spacing: .5px;
+      margin-bottom: 6px;
+    }
+    .meta-val {
+      font-size: 13px;
+      color: #333;
+      line-height: 1.6;
+    }
+    .sec-title {
+      font-size: 12px;
+      font-weight: 800;
+      color: var(--or-d);
+      text-transform: uppercase;
+      letter-spacing: .5px;
+      margin-bottom: 8px;
+      padding-bottom: 6px;
+      border-bottom: 2px solid var(--or-bd);
+    }
+    
+    .inv-tbl {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 20px;
+    }
+    .inv-tbl th, .inv-tbl td {
+      padding: 10px 12px;
+      border-bottom: 1px solid #eee;
+    }
+    .inv-tbl th {
+      background: #fafafa;
+      font-size: 11px;
+      font-weight: 700;
+      color: #555;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .inv-tbl td {
+      font-size: 13px;
+      color: #1a1a1a;
+    }
+    .t-l { text-align: left; }
+    .t-c { text-align: center; }
+    .t-r { text-align: right; }
+
+    .sum-wrap {
+      display: flex;
+      justify-content: flex-end;
+      margin-bottom: 20px;
+    }
+    .sum-box {
+      width: 250px;
+      background: #fafafa;
+      border-radius: 8px;
+      padding: 12px;
+      border: 1px solid #eee;
+    }
+    .sb-row {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 8px;
+      font-size: 13px;
+      color: #555;
+    }
+    .sb-total {
+      margin-top: 8px;
+      padding-top: 8px;
+      border-top: 1.5px dashed #ccc;
+      font-weight: 800;
+      font-size: 16px;
+      color: var(--or-d);
+      margin-bottom: 0;
+    }
+
+    .note-sect {
+      margin-bottom: 24px;
+      border: 1px dashed var(--or-bd);
+      padding: 12px;
+      border-radius: 8px;
+      background: var(--or-bg);
+    }
+    .warranty-badge {
+      display: inline-block;
+      background: rgba(34, 197, 94, 0.15);
+      color: #16a34a;
+      border: 1px solid rgba(34, 197, 94, 0.3);
+      padding: 4px 10px;
+      border-radius: 20px;
+      font-size: 11px;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+    .note-text {
+      font-size: 11px;
+      color: #666;
+      line-height: 1.5;
+    }
+
+    .ttd-row {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 40px;
+      padding: 0 40px;
+    }
+    .ttd-box {
+      text-align: center;
+      width: 150px;
+    }
+    .ttd-role {
+      font-size: 11px;
+      color: #666;
+      margin-bottom: 40px;
+    }
+    .ttd-sp {
+      height: 60px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 10px;
+    }
+    .ttd-sp img {
+      max-height: 100%;
+      max-width: 100%;
+    }
+    .ttd-ln {
+      font-size: 12px;
+      font-weight: 600;
+      color: #1a1a1a;
+      border-top: 1px solid #ccc;
+      padding-top: 8px;
+    }
+
+    .inv-foot {
+      margin-top: 30px;
+      text-align: center;
+      font-size: 11px;
+      color: #888;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="print-container" id="print-area">
+    <!-- Diisi oleh JS -->
+  </div>
+
+  <script>
+    function formatRp(angka) {
+      return "Rp " + angka.toLocaleString('id-ID');
+    }
+
+    window.onload = () => {
+      const params = new URLSearchParams(window.location.search);
+      const dataStr = params.get('d');
+      const storeStr = params.get('s');
+      
+      if (!dataStr) {
+        document.body.innerHTML = "<h3>Data Invoice Tidak Ditemukan</h3>";
+        return;
+      }
+
+      try {
+        const data = JSON.parse(decodeURIComponent(escape(atob(dataStr))));
+        const store = storeStr ? JSON.parse(decodeURIComponent(escape(atob(storeStr)))) : {
+          name: "BAGASKARA CELL",
+          address: "Alamat Toko",
+          contact: "08xxxx",
+          notes: "Terima kasih."
+        };
+
+        let itemsHtml = '';
+        data.items.forEach(it => {
+          let desc = it.name;
+          if (it.imei) desc += `<br><span style="font-size:10px; color:#666;">IMEI/SN: ${it.imei}</span>`;
+          itemsHtml += `
+            <tr>
+              <td class="t-l">${desc}</td>
+              <td class="t-c">${it.qty}</td>
+              <td class="t-r">${formatRp(it.price)}</td>
+              <td class="t-r">${formatRp(it.subtotal)}</td>
+            </tr>
+          `;
+        });
+
+        let warrantyHtml = '';
+        let globalWarranty = data.items.find(i => i.warranty && i.warranty.toLowerCase() !== 'tidak ada');
+        if (globalWarranty) {
+          warrantyHtml = `<div class="warranty-badge">${globalWarranty.warranty}</div>`;
+        }
+
+        const html = `
+          <div class="inv-header">
+            <img src="logo-light.png" class="inv-logo-box" alt="Logo" onerror="this.style.display='none'">
+            <div class="inv-store-info">
+              <div class="inv-store-name">${store.name.toUpperCase()}</div>
+              <div class="inv-store-detail">
+                ${store.address}<br>
+                ${store.contact}
+              </div>
+            </div>
+            <div class="inv-title-badge">INVOICE</div>
+          </div>
+
+          <div class="stripe"></div>
+
+          <div class="meta-grid">
+            <div class="meta-box">
+              <div class="meta-lbl">Detail Invoice</div>
+              <div class="meta-val">
+                <strong>No. Invoice:&nbsp;</strong>${data.invNo}<br>
+                <strong>Tanggal:&nbsp;</strong>${data.dateFormatted}<br>
+                <strong>Pembayaran:&nbsp;</strong>${data.payment}
+              </div>
+            </div>
+            <div class="meta-box">
+              <div class="meta-lbl">Detail Pembeli</div>
+              <div class="meta-val">
+                <strong>Nama:&nbsp;</strong>${data.buyerName}<br>
+                <strong>No. HP:&nbsp;</strong>${data.buyerPhone}<br>
+                <strong>Alamat:&nbsp;</strong>${data.buyerAddress || '-'}
+              </div>
+            </div>
+          </div>
+
+          <div class="sec-title">Daftar Barang / Jasa</div>
+          <table class="inv-tbl">
+            <thead>
+              <tr>
+                <th class="t-l">Nama Barang / Jasa</th>
+                <th width="50px" class="t-c">Qty</th>
+                <th width="130px" class="t-r">Harga Satuan</th>
+                <th width="130px" class="t-r">Subtotal</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${itemsHtml}
+            </tbody>
+          </table>
+
+          <div class="sum-wrap">
+            <div class="sum-box">
+              <div class="sb-row">
+                <span>Subtotal</span>
+                <span>${formatRp(data.subtotal)}</span>
+              </div>
+              <div class="sb-row">
+                <span>Diskon</span>
+                <span>${formatRp(data.discount)}</span>
+              </div>
+              <div class="sb-row sb-total">
+                <span>TOTAL</span>
+                <span>${formatRp(data.total)}</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="note-sect">
+            ${warrantyHtml}
+            <div class="note-text">${store.notes.replace(/\n/g, '<br>')}</div>
+          </div>
+
+          <div class="ttd-row">
+            <div class="ttd-box">
+              <div class="ttd-role">Tanda Tangan Pelanggan</div>
+              <div class="ttd-sp">
+                ${data.signatures && data.signatures.buyer ? `<img src="${data.signatures.buyer}">` : ''}
+              </div>
+              <div class="ttd-ln">( ${data.buyerName || 'Pelanggan'} )</div>
+            </div>
+            <div class="ttd-box">
+              <div class="ttd-role">Penjual</div>
+              <div class="ttd-sp">
+                ${data.signatures && data.signatures.seller ? `<img src="${data.signatures.seller}">` : ''}
+              </div>
+              <div class="ttd-ln">( Hormat Kami )</div>
+            </div>
+          </div>
+
+          <div class="inv-foot">
+            Terima kasih telah berbelanja di <strong>${store.name}</strong>.
+          </div>
+        `;
+
+        document.getElementById('print-area').innerHTML = html;
+
+        // Auto trigger print after a brief delay for images
+        setTimeout(() => {
+          window.print();
+        }, 800);
+
+      } catch (err) {
+        document.body.innerHTML = "<h3>Terjadi kesalahan saat memuat data invoice.</h3><p>" + err.message + "</p>";
+      }
+    };
+  </script>
+</body>
+</html>
