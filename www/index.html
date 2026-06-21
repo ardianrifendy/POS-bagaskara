@@ -2988,6 +2988,56 @@
     </div>
   </div>
 
+  <!-- ONBOARDING MODAL -->
+  <div id="onboarding-modal" class="modal" style="z-index: 10000; align-items: center; justify-content: center;">
+    <div class="modal-content" style="max-width: 400px; padding: 0; overflow: hidden; background: var(--bk2); border: 1px solid rgba(255,255,255,0.1); display: flex; flex-direction: column;">
+      
+      <div id="onboard-slides" style="display: flex; transition: transform 0.3s ease; width: 300%;">
+        
+        <!-- Slide 1 -->
+        <div class="onboard-slide" style="width: 33.333%; padding: 30px 25px; text-align: center; box-sizing: border-box;">
+          <div style="width: 60px; height: 60px; background: rgba(255, 152, 0, 0.1); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px; color: var(--or);">
+            <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
+          </div>
+          <h3 style="margin:0 0 10px; font-size: 18px; color: var(--white);" data-i18n="Selamat Datang di Bagaskara POS!">Selamat Datang di Bagaskara POS!</h3>
+          <p style="font-size: 13px; color: var(--gy); line-height: 1.5; margin:0;" data-i18n="Aplikasi Kasir & Database cerdas yang didesain khusus untuk efisiensi transaksi toko Anda.">Aplikasi Kasir & Database cerdas yang didesain khusus untuk efisiensi transaksi toko Anda.</p>
+        </div>
+
+        <!-- Slide 2 -->
+        <div class="onboard-slide" style="width: 33.333%; padding: 30px 25px; text-align: center; box-sizing: border-box;">
+          <div style="width: 60px; height: 60px; background: rgba(255, 152, 0, 0.1); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px; color: var(--or);">
+            <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+          </div>
+          <h3 style="margin:0 0 10px; font-size: 18px; color: var(--white);" data-i18n="Manajemen Invoice Cepat">Manajemen Invoice Cepat</h3>
+          <p style="font-size: 13px; color: var(--gy); line-height: 1.5; margin:0;" data-i18n="Buat nota transaksi dalam hitungan detik, pantau riwayat piutang, dan bagikan invoice PDF langsung ke pelanggan.">Buat nota transaksi dalam hitungan detik, pantau riwayat piutang, dan bagikan invoice PDF langsung ke pelanggan.</p>
+        </div>
+
+        <!-- Slide 3 -->
+        <div class="onboard-slide" style="width: 33.333%; padding: 30px 25px; text-align: center; box-sizing: border-box;">
+          <div style="width: 60px; height: 60px; background: rgba(255, 152, 0, 0.1); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px; color: var(--or);">
+            <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+          </div>
+          <h3 style="margin:0 0 10px; font-size: 18px; color: var(--white);" data-i18n="Kustomisasi Penuh">Kustomisasi Penuh</h3>
+          <p style="font-size: 13px; color: var(--gy); line-height: 1.5; margin:0;" data-i18n="Eksplorasi menu Pengaturan untuk mengubah Tema, Bahasa, Catatan Garansi, hingga Backup Data dengan mudah.">Eksplorasi menu Pengaturan untuk mengubah Tema, Bahasa, Catatan Garansi, hingga Backup Data dengan mudah.</p>
+        </div>
+
+      </div>
+
+      <div style="padding: 15px 25px 25px; display: flex; flex-direction: column; align-items: center; gap: 20px;">
+        
+        <!-- Dots -->
+        <div style="display: flex; gap: 8px;">
+          <div class="onboard-dot active" style="width: 8px; height: 8px; border-radius: 50%; background: var(--or); transition: 0.3s;"></div>
+          <div class="onboard-dot" style="width: 8px; height: 8px; border-radius: 50%; background: rgba(255,255,255,0.2); transition: 0.3s;"></div>
+          <div class="onboard-dot" style="width: 8px; height: 8px; border-radius: 50%; background: rgba(255,255,255,0.2); transition: 0.3s;"></div>
+        </div>
+
+        <button id="btn-onboard-next" class="btn" style="width: 100%; border-radius: 12px; padding: 14px; font-size: 14px; font-weight: 700;" onclick="nextOnboardSlide()" data-i18n="Lanjut">Lanjut</button>
+
+      </div>
+    </div>
+  </div>
+
   <!-- OCR PROCESSING MODAL -->
   <div id="ocr-modal" style="display:none; position:fixed; top:0; left:0; right:0; bottom:0; background:rgba(0,0,0,0.9); z-index:2000; flex-direction:column; align-items:center; justify-content:center; padding:20px;">
     <div style="width:100%; max-width:400px; background:#1e1e1e; border-radius:20px; overflow:hidden; border:1px solid rgba(255,255,255,0.08); display:flex; flex-direction:column; box-shadow:0 10px 30px rgba(0,0,0,0.5);">
@@ -3329,6 +3379,43 @@
       custom: ""
     };
 
+    // ONBOARDING LOGIC
+    let currentOnboardSlide = 0;
+    
+    function checkOnboarding() {
+      if (!localStorage.getItem('bagaskara_onboarded_v1')) {
+        document.getElementById('onboarding-modal').style.display = 'flex';
+      }
+    }
+    
+    function nextOnboardSlide() {
+      const slides = document.getElementById('onboard-slides');
+      const dots = document.querySelectorAll('.onboard-dot');
+      const btn = document.getElementById('btn-onboard-next');
+      
+      const lang = localStorage.getItem('bagaskara_lang') || 'id';
+      const isEn = lang === 'en';
+      
+      currentOnboardSlide++;
+      
+      if (currentOnboardSlide > 2) {
+        // Finish onboarding
+        localStorage.setItem('bagaskara_onboarded_v1', 'true');
+        document.getElementById('onboarding-modal').style.display = 'none';
+        return;
+      }
+      
+      slides.style.transform = `translateX(-${currentOnboardSlide * 33.333}%)`;
+      
+      dots.forEach((dot, index) => {
+        dot.style.background = index === currentOnboardSlide ? 'var(--or)' : 'rgba(255,255,255,0.2)';
+      });
+      
+      if (currentOnboardSlide === 2) {
+        btn.textContent = isEn ? 'Get Started' : 'Mulai Gunakan';
+      }
+    }
+
     // INITIALIZATION
     window.onload = function() {
       // Load and apply theme
@@ -3365,6 +3452,7 @@
 
       // 4. Load database from localStorage
       loadDatabase();
+      checkOnboarding();
       loadProducts();
       
       // Apply translation
@@ -6801,6 +6889,13 @@
         "Orang": "People", "Unit": "Units", "Invoice Terdaftar": "Registered Invoices", "Pilih Bahasa": "Choose Language",
         "Pilih Tema": "Choose Theme", "Mode Gelap": "Dark Mode", "Mode Terang": "Light Mode",
         "Semua": "All", "Lunas": "Paid", "DP": "Deposit / Down Payment", "Belum Bayar": "Unpaid", "Semua Piutang": "All Receivables",
+        "Selamat Datang di Bagaskara POS!": "Welcome to Bagaskara POS!",
+        "Aplikasi Kasir & Database cerdas yang didesain khusus untuk efisiensi transaksi toko Anda.": "A smart POS & Database application designed specifically for your store's transaction efficiency.",
+        "Manajemen Invoice Cepat": "Fast Invoice Management",
+        "Buat nota transaksi dalam hitungan detik, pantau riwayat piutang, dan bagikan invoice PDF langsung ke pelanggan.": "Create transaction notes in seconds, monitor receivables history, and share PDF invoices directly to customers.",
+        "Kustomisasi Penuh": "Full Customization",
+        "Eksplorasi menu Pengaturan untuk mengubah Tema, Bahasa, Catatan Garansi, hingga Backup Data dengan mudah.": "Explore the Settings menu to easily change Themes, Languages, Warranty Notes, and Data Backups.",
+        "Lanjut": "Next",
         "Penjualan 7 Hari Terakhir": "Last 7 Days Sales",
         "Cari tipe, merek, IMEI, kondisi...": "Search brand, model, IMEI, condition...",
         "Cari nama pembeli, no invoice, IMEI...": "Search customer name, invoice no, IMEI...",
@@ -6855,6 +6950,13 @@
         "Orang": "Orang", "Unit": "Unit", "Invoice Terdaftar": "Invoice Terdaftar", "Pilih Bahasa": "Pilih Bahasa",
         "Pilih Tema": "Pilih Tema", "Mode Gelap": "Mode Gelap", "Mode Terang": "Mode Terang",
         "Semua": "Semua", "Lunas": "Lunas", "DP": "DP", "Belum Bayar": "Belum Bayar", "Semua Piutang": "Semua Piutang",
+        "Selamat Datang di Bagaskara POS!": "Selamat Datang di Bagaskara POS!",
+        "Aplikasi Kasir & Database cerdas yang didesain khusus untuk efisiensi transaksi toko Anda.": "Aplikasi Kasir & Database cerdas yang didesain khusus untuk efisiensi transaksi toko Anda.",
+        "Manajemen Invoice Cepat": "Manajemen Invoice Cepat",
+        "Buat nota transaksi dalam hitungan detik, pantau riwayat piutang, dan bagikan invoice PDF langsung ke pelanggan.": "Buat nota transaksi dalam hitungan detik, pantau riwayat piutang, dan bagikan invoice PDF langsung ke pelanggan.",
+        "Kustomisasi Penuh": "Kustomisasi Penuh",
+        "Eksplorasi menu Pengaturan untuk mengubah Tema, Bahasa, Catatan Garansi, hingga Backup Data dengan mudah.": "Eksplorasi menu Pengaturan untuk mengubah Tema, Bahasa, Catatan Garansi, hingga Backup Data dengan mudah.",
+        "Lanjut": "Lanjut",
         "Penjualan 7 Hari Terakhir": "Penjualan 7 Hari Terakhir",
         "Cari tipe, merek, IMEI, kondisi...": "Cari tipe, merek, IMEI, kondisi...",
         "Cari nama pembeli, no invoice, IMEI...": "Cari nama pembeli, no invoice, IMEI...",
