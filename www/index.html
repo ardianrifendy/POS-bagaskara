@@ -2177,11 +2177,7 @@
     <!-- TAB 1: BERANDA / DASHBOARD -->
     <div id="tab-dashboard" class="tab-content active">
       
-      <!-- View Switcher -->
-      <div class="dashboard-switcher">
-        <button class="switcher-btn active" id="btn-dash-ringkasan" onclick="switchDashboardView('ringkasan')">Ringkasan</button>
-        <button class="switcher-btn" id="btn-dash-laporan" onclick="switchDashboardView('laporan')">Laporan Bulanan</button>
-      </div>
+
 
       <!-- VIEW A: RINGKASAN HARIAN -->
       <div id="dash-view-ringkasan">
@@ -2284,9 +2280,10 @@
       </div>
 
       <!-- VIEW B: LAPORAN BULANAN & PENGELUARAN -->
-      <div id="dash-view-laporan" style="display: none;">
+      <div id="dash-view-laporan">
         <!-- Period Selector -->
-        <div class="card" style="padding:14px 18px;">
+        <div class="card" style="padding:14px 18px; margin-top:16px;">
+          <div class="card-title" style="margin-bottom:12px; font-size:16px; border-bottom:1px solid rgba(255,255,255,0.05); padding-bottom:8px;">Laporan Bulanan</div>
           <div class="period-selector">
             <input type="hidden" id="laporan-month" value="1">
             <div class="cs-wrap" style="flex:1;">
@@ -3585,26 +3582,7 @@
     }
 
     // DASHBOARD SUB-VIEW SWITCHER
-    function switchDashboardView(viewId) {
-      const ringkasanEl = document.getElementById('dash-view-ringkasan');
-      const laporanEl = document.getElementById('dash-view-laporan');
-      const btnRingkasan = document.getElementById('btn-dash-ringkasan');
-      const btnLaporan = document.getElementById('btn-dash-laporan');
 
-      if (viewId === 'ringkasan') {
-        ringkasanEl.style.display = 'block';
-        laporanEl.style.display = 'none';
-        btnRingkasan.classList.add('active');
-        btnLaporan.classList.remove('active');
-        updateDashboardStats();
-      } else {
-        ringkasanEl.style.display = 'none';
-        laporanEl.style.display = 'block';
-        btnRingkasan.classList.remove('active');
-        btnLaporan.classList.add('active');
-        renderLaporanTab();
-      }
-    }
 
     // ACCORDION CONTROL
     function toggleStep(stepId) {
