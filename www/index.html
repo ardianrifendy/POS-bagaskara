@@ -3487,7 +3487,7 @@
       div.id = `item-row-${itemIndex}`;
       div.dataset.productId = ''; // Empty by default
       div.innerHTML = `
-        <button type="button" class="btn-del-item" onclick="removeItemField(${div.id})">Hapus</button>
+        <button type="button" class="btn-del-item" onclick="removeItemField('${div.id}')">Hapus</button>
         <div class="field" style="margin-bottom:8px;">
           <label>Nama Barang / Jasa</label>
           <div style="display: flex; gap: 8px;">
@@ -3516,6 +3516,10 @@
             <input type="number" class="item-price" placeholder="Harga Satuan" oninput="updateLiveTotal()">
           </div>
         </div>
+        <div class="field" style="margin-top:8px; margin-bottom:0;">
+          <label>Diskon / Potongan (Rp) - <i>Opsional</i></label>
+          <input type="number" class="item-discount" placeholder="Contoh: 50000" oninput="updateLiveTotal()">
+        </div>
       `;
       container.appendChild(div);
       updateLiveTotal();
@@ -3536,7 +3540,8 @@
       itemCards.forEach(card => {
         const qty = parseInt(card.querySelector('.item-qty').value) || 0;
         const price = parseInt(card.querySelector('.item-price').value) || 0;
-        subtotal += qty * price;
+        const itemDiscount = parseInt(card.querySelector('.item-discount')?.value) || 0;
+        subtotal += Math.max(0, (qty * price) - itemDiscount);
       });
 
       const discount = parseInt(document.getElementById('inp-discount').value) || 0;
@@ -3600,6 +3605,7 @@
         const imei = card.querySelector('.item-imei').value.trim();
         const qty = parseInt(card.querySelector('.item-qty').value) || 0;
         const price = parseInt(card.querySelector('.item-price').value) || 0;
+        const itemDiscount = parseInt(card.querySelector('.item-discount')?.value) || 0;
         const productId = card.dataset.productId ? parseInt(card.dataset.productId) : '';
 
         if (!name) {
@@ -3607,9 +3613,9 @@
           card.querySelector('.item-name').focus();
         }
 
-        const sub = qty * price;
+        const sub = Math.max(0, (qty * price) - itemDiscount);
         subtotal += sub;
-        items.push({ name, imei, qty, price, sub, productId });
+        items.push({ name, imei, qty, price, discount: itemDiscount, sub, productId });
       });
 
       if (!validateOk) {
@@ -4997,6 +5003,7 @@
           <td class="t-l">
             <strong>${item.name}</strong>
             ${item.imei ? `<br><span style="font-size:9.5px; color:#555;">IMEI/SN: ${item.imei}</span>` : ''}
+            ${item.discount > 0 ? `<br><span style="font-size:9.5px; color:var(--rd);">Diskon: -Rp ${item.discount.toLocaleString('id-ID')}</span>` : ''}
           </td>
           <td class="t-c">${item.qty}</td>
           <td class="t-c">Rp ${item.price.toLocaleString('id-ID')}</td>
