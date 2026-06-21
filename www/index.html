@@ -5027,6 +5027,20 @@
             stylesHtml += el.outerHTML;
           });
           
+          // Konversi gambar logo ke Base64 agar native printer bisa membacanya
+          const originalLogo = document.querySelector('.inv-logo-box');
+          if (originalLogo) {
+            const cloneLogo = clone.querySelector('.inv-logo-box');
+            if (cloneLogo) {
+              const canvas = document.createElement('canvas');
+              canvas.width = originalLogo.naturalWidth || 500;
+              canvas.height = originalLogo.naturalHeight || 500;
+              const ctx = canvas.getContext('2d');
+              ctx.drawImage(originalLogo, 0, 0);
+              cloneLogo.src = canvas.toDataURL('image/png');
+            }
+          }
+          
           // Pastikan signature seller dirender ulang di clone jika canvas digunakan
           if (sigPads.seller && !sigPadStates.seller) {
             const sellerImg = clone.querySelector('#prv-sig-seller');
@@ -5047,10 +5061,26 @@
                 <title>Invoice</title>
                 ${stylesHtml}
                 <style>
-                  @page { size: letter landscape; margin: 0.5cm; }
-                  body { background: #fff !important; margin: 0; padding: 0; width: 1000px !important; color: #000 !important; font-family: Arial, sans-serif !important; }
-                  .preview-box { box-shadow: none !important; border-radius: 0 !important; padding: 20px !important; margin: 0 !important; width: 1000px !important; max-width: 1000px !important; }
+                  @page { margin: 0; }
+                  html, body { 
+                    background: #fff !important; 
+                    margin: 0 !important; 
+                    padding: 0 !important; 
+                    width: 1000px !important; 
+                    color: #000 !important; 
+                    font-family: Arial, sans-serif !important; 
+                  }
+                  .preview-box { 
+                    box-shadow: none !important; 
+                    border-radius: 0 !important; 
+                    padding: 30px !important; 
+                    margin: 0 !important; 
+                    width: 1000px !important; 
+                    max-width: 1000px !important; 
+                    page-break-inside: avoid;
+                  }
                   .no-print { display: none !important; }
+                  * { box-sizing: border-box; }
                 </style>
               </head>
               <body>
