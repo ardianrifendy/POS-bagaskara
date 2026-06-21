@@ -60,6 +60,7 @@
 <summary><strong>🧾 Invoice Generator</strong></summary>
 
 - Form pembuatan invoice multi-item dengan IMEI/Serial Number
+- **Diskon Spesifik per Item** — terapkan potongan harga untuk produk tertentu
 - Integrasi **kontak HP** — cari dan pilih pelanggan langsung dari phonebook
 - Status pembayaran: **Lunas** / **DP** / **Belum Bayar**
 - 3 tipe garansi: Tanpa Garansi, Personal Toko, Resmi Brand

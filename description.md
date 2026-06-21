@@ -337,3 +337,12 @@ Bagian ini mencatat pembaruan besar, kendala yang dihadapi, dan solusi teknis ya
   - Menyelipkan entitas HTML spasi mati (`&nbsp;`) setelah tag `<strong>` pada nama/invoice agar Android tidak menelan (*collapse*) spasi kosong tersebut.
 - **Kendala 4 (Layout Sempit/Tergencet)**: Desain PDF terlihat "tidak aturan" karena `html2canvas` menangkap lebar kanvas berdasarkan lebar layar HP (`original.offsetWidth` ~360px), lalu memelarkannya ke ukuran A4.
 - **Solusi 4**: Menanamkan *hardcode* lebar mutlak `width: 800px` pada elemen *clone* dan kontainer *wrapper*, serta menset parameter `windowWidth: 800` pada konfigurasi `html2canvas`. Ini menipu *engine* HP agar berpikir bahwa ia adalah layar komputer lebar saat memproses gambar, menghasilkan tabel dan tata letak berproporsi desktop A4 yang lega dan presisi.
+
+### D. Penambahan Diskon Spesifik & Refaktor Tampilan Cetak
+- **Perbaikan UI Dialog Android**: Memaksa penggunaan tema `Light` pada sistem `AlertDialog` dan `DatePickerDialog` Capacitor di `styles.xml` agar teks peringatan tidak hilang (hitam di atas abu-abu) ketika HP menggunakan mode gelap (*Dark Mode*).
+- **Fitur Diskon per Produk**: Memodifikasi DOM produk agar memiliki input "Diskon/Potongan". Nilai diskon diproses secara *live* pada fungsi kalkulasi total dan secara dinamis disisipkan pada tabel PDF cetak tepat di bawah nama produk.
+- **Bug Fix Tombol Hapus**: Menyelesaikan masalah `ReferenceError` pada metode `removeItemField` yang gagal menghapus baris akibat kurangnya tanda kutip pada parameter resolusi ID *string*.
+- **Migrasi Font & Layout Cetak (Capacitor Printer)**:
+  - Beralih menggunakan *font* **Ubuntu** yang diunduh langsung dari Google Fonts untuk dokumen cetak agar selaras dengan identitas toko Bagaskara Cell.
+  - Mengatasi isu "bingkai hitam" tebal di aplikasi PDF Viewer dengan memaksakan latar belakang `body` dan HTML murni putih (`#ffffff !important`).
+  - Mengembalikan tata letak cetak ke format *kompak* proporsional (`width: 1000px`) yang disejajarkan ke tengah, margin murni dinonaktifkan (`margin: 0`), dan dicetak paksa dalam format mendatar (`@page { size: landscape; }`).
