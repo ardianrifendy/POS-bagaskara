@@ -5007,12 +5007,34 @@
     }
 
     // FUNGSI UNTUK CETAK INVOICE (DIPANGGIL DARI PREVIEW)
-    // FUNGSI UNTUK CETAK INVOICE NATIVE
+    // FUNGSI UNTUK CETAK INVOICE NATIVE & ANDROID
     function printInvoiceNative() {
       showToast("Menyiapkan dokumen untuk dicetak...", false);
-      setTimeout(() => {
-        window.print();
-      }, 500);
+      
+      // Jika berjalan di dalam aplikasi Android (Capacitor)
+      if (typeof CapBrowser !== 'undefined') {
+        const data = currentPreviewData;
+        if (!data) return;
+        
+        const store = JSON.parse(localStorage.getItem('bagaskara_store_info')) || defaultStoreSettings;
+        const sellerSig = (sigPads.seller && !sigPadStates.seller) ? sigPads.seller.canvas.toDataURL() : null;
+        const printData = Object.assign({}, data, { sellerSignature: sellerSig });
+        
+        const encodedData = btoa(unescape(encodeURIComponent(JSON.stringify(printData))));
+        const encodedStore = btoa(unescape(encodeURIComponent(JSON.stringify(store))));
+        
+        const printUrl = `https://ardianrifendy.github.io/POS-bagaskara/print.html?d=${encodedData}&s=${encodedStore}`;
+        
+        setTimeout(() => {
+          // Buka di browser eksternal bawaan sistem (Chrome) yang mendukung full print spooler
+          window.open(printUrl, '_system');
+        }, 500);
+      } else {
+        // Jika berjalan di browser PC biasa
+        setTimeout(() => {
+          window.print();
+        }, 500);
+      }
     }
 
     // SETTINGS PANEL ACTIONS
