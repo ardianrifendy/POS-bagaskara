@@ -5112,9 +5112,12 @@
       // If maxTotal is 0, make it 1 so we don't divide by 0
       if (maxTotal === 0) maxTotal = 1;
 
+      const lang = localStorage.getItem('bagaskara_lang') || 'id';
+      const jtStr = lang === 'en' ? 'M' : 'Jt';
+
       // Render Y-Axis
       const formatAxis = (val) => {
-        if(val >= 1000000) return (val/1000000).toFixed(1).replace('.0','') + 'Jt';
+        if(val >= 1000000) return (val/1000000).toFixed(1).replace('.0','') + jtStr;
         if(val >= 1000) return (val/1000).toFixed(0) + 'K';
         return val;
       };
@@ -5177,11 +5180,16 @@
       const totalPiutang = piutangInvoices.reduce((sum, inv) => sum + (inv.amountRemaining || 0), 0);
       const uniqueDebtors = new Set(piutangInvoices.map(inv => inv.custName)).size;
 
+      const lang = localStorage.getItem('bagaskara_lang') || 'id';
+      const tMap = translations[lang] || translations.id;
+      const unitStr = tMap["Unit"] || "Unit";
+      const invStr = tMap["Invoice Terdaftar"] || "Invoice Terdaftar";
+
       document.getElementById('stat-count-today').innerText = todayCount;
       document.getElementById('stat-revenue-today').innerText = `Rp ${todayRevenue.toLocaleString('id-ID')}`;
-      document.getElementById('stat-inventory-qty').innerText = `${totalStokCount} Unit`;
+      document.getElementById('stat-inventory-qty').innerText = `${totalStokCount} ${unitStr}`;
       document.getElementById('stat-inventory-value').innerText = `Rp ${totalInventoryValue.toLocaleString('id-ID')}`;
-      document.getElementById('stat-total-db').innerHTML = `${database.length} <span style="font-size:12px; font-weight:400; color:var(--gy)">Invoice Terdaftar</span>`;
+      document.getElementById('stat-total-db').innerHTML = `${database.length} <span style="font-size:12px; font-weight:400; color:var(--gy)">${invStr}</span>`;
 
       // Show/hide piutang card on dashboard
       const piutangCard = document.getElementById('piutang-dashboard-card');
@@ -6793,6 +6801,7 @@
         "Orang": "People", "Unit": "Units", "Invoice Terdaftar": "Registered Invoices", "Pilih Bahasa": "Choose Language",
         "Pilih Tema": "Choose Theme", "Mode Gelap": "Dark Mode", "Mode Terang": "Light Mode",
         "Semua": "All", "Lunas": "Paid", "DP": "Deposit / Down Payment", "Belum Bayar": "Unpaid", "Semua Piutang": "All Receivables",
+        "Penjualan 7 Hari Terakhir": "Last 7 Days Sales",
         "Cari tipe, merek, IMEI, kondisi...": "Search brand, model, IMEI, condition...",
         "Cari nama pembeli, no invoice, IMEI...": "Search customer name, invoice no, IMEI...",
         "Pengaturan": "Settings", "Toko POS & Kasir Aktif": "Active POS & Cashier Store", "Ekspor backup (JSON), impor database, atau reset data": "Export backup (JSON), import database, or reset data",
@@ -6846,6 +6855,7 @@
         "Orang": "Orang", "Unit": "Unit", "Invoice Terdaftar": "Invoice Terdaftar", "Pilih Bahasa": "Pilih Bahasa",
         "Pilih Tema": "Pilih Tema", "Mode Gelap": "Mode Gelap", "Mode Terang": "Mode Terang",
         "Semua": "Semua", "Lunas": "Lunas", "DP": "DP", "Belum Bayar": "Belum Bayar", "Semua Piutang": "Semua Piutang",
+        "Penjualan 7 Hari Terakhir": "Penjualan 7 Hari Terakhir",
         "Cari tipe, merek, IMEI, kondisi...": "Cari tipe, merek, IMEI, kondisi...",
         "Cari nama pembeli, no invoice, IMEI...": "Cari nama pembeli, no invoice, IMEI...",
         "Pengaturan": "Pengaturan", "Toko POS & Kasir Aktif": "Toko POS & Kasir Aktif", "Ekspor backup (JSON), impor database, atau reset data": "Ekspor backup (JSON), impor database, atau reset data",
