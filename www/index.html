@@ -14,10 +14,10 @@
   <!-- Tesseract.js for OCR text recognition from camera -->
   <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
   
-  <!-- Google Fonts: Outfit -->
+  <!-- Google Fonts: Outfit & Ubuntu -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Ubuntu:wght@300;400;500;700&display=swap" rel="stylesheet">
   
   <style>
     :root {
@@ -1048,7 +1048,7 @@
 
     /* INVOICE SHEET STYLING (FOR PRINT & DISPLAY) */
     .preview-box {
-      font-family: Arial, Helvetica, sans-serif !important; /* Wajib untuk html2canvas agar spasi tidak hilang */
+      font-family: 'Ubuntu', sans-serif !important;
       background: #fff;
       color: #1a1a1a;
       padding: 16px;
@@ -1059,7 +1059,7 @@
     }
     .preview-box * {
       letter-spacing: 0 !important; /* Hindari bug tumpang tindih huruf di html2canvas */
-      font-family: Arial, Helvetica, sans-serif !important;
+      font-family: 'Ubuntu', sans-serif !important;
       text-rendering: geometricPrecision !important;
     }
     .inv-header {
@@ -5121,7 +5121,7 @@
                     width: 100% !important; 
                     min-height: 100% !important;
                     color: #000 !important; 
-                    font-family: Arial, sans-serif !important; 
+                    font-family: 'Ubuntu', sans-serif !important; 
                   }
                   .preview-box { 
                     background: #ffffff !important;
