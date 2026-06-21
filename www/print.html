@@ -6,21 +6,21 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
-    
+
     :root {
       --or: #f7931a;
       --or-bg: rgba(247, 147, 26, 0.05);
       --or-bd: rgba(247, 147, 26, 0.2);
       --or-d: #d87d0f;
     }
-    
+
     * {
       box-sizing: border-box;
       margin: 0;
       padding: 0;
       font-family: 'Inter', Arial, sans-serif;
     }
-    
+
     body {
       background: #f5f5f5;
       padding: 20px;
@@ -28,11 +28,10 @@
       justify-content: center;
     }
 
-    /* Kertas Cetak */
     .print-container {
       background: #fff;
       width: 100%;
-      max-width: 1000px; /* Lebar optimal untuk Landscape Letter */
+      max-width: 1000px;
       padding: 30px;
       box-shadow: 0 5px 15px rgba(0,0,0,0.1);
       border-radius: 8px;
@@ -124,7 +123,7 @@
       padding-bottom: 6px;
       border-bottom: 2px solid var(--or-bd);
     }
-    
+
     .inv-tbl {
       width: 100%;
       border-collapse: collapse;
@@ -253,14 +252,14 @@
 
   <script>
     function formatRp(angka) {
-      return "Rp " + angka.toLocaleString('id-ID');
+      return "Rp " + (angka || 0).toLocaleString('id-ID');
     }
 
     window.onload = () => {
       const params = new URLSearchParams(window.location.search);
       const dataStr = params.get('d');
       const storeStr = params.get('s');
-      
+
       if (!dataStr) {
         document.body.innerHTML = "<h3>Data Invoice Tidak Ditemukan</h3>";
         return;
@@ -271,8 +270,7 @@
         const store = storeStr ? JSON.parse(decodeURIComponent(escape(atob(storeStr)))) : {
           name: "BAGASKARA CELL",
           address: "Alamat Toko",
-          contact: "08xxxx",
-          notes: "Terima kasih."
+          phones: "08xxxx"
         };
 
         let itemsHtml = '';
@@ -284,16 +282,21 @@
               <td class="t-l">${desc}</td>
               <td class="t-c">${it.qty}</td>
               <td class="t-r">${formatRp(it.price)}</td>
-              <td class="t-r">${formatRp(it.subtotal)}</td>
+              <td class="t-r">${formatRp(it.sub)}</td>
             </tr>
           `;
         });
 
         let warrantyHtml = '';
-        let globalWarranty = data.items.find(i => i.warranty && i.warranty.toLowerCase() !== 'tidak ada');
-        if (globalWarranty) {
-          warrantyHtml = `<div class="warranty-badge">${globalWarranty.warranty}</div>`;
+        if (data.warrantyType && data.warrantyType !== 'none') {
+          const wLabel = data.warrantyType === 'personal'
+            ? `Garansi Personal Toko (${data.warrantyDur || '-'})`
+            : `Garansi Resmi Brand (${data.warrantyDur || '-'})`;
+          warrantyHtml = `<div class="warranty-badge">${wLabel}</div>`;
         }
+
+        const noteText = (data.notes || '').replace(/\n/g, '<br>');
+        const storeContact = store.phones || store.contact || '';
 
         const html = `
           <div class="inv-header">
@@ -302,7 +305,7 @@
               <div class="inv-store-name">${store.name.toUpperCase()}</div>
               <div class="inv-store-detail">
                 ${store.address}<br>
-                ${store.contact}
+                ${storeContact}
               </div>
             </div>
             <div class="inv-title-badge">INVOICE</div>
@@ -316,15 +319,15 @@
               <div class="meta-val">
                 <strong>No. Invoice:&nbsp;</strong>${data.invNo}<br>
                 <strong>Tanggal:&nbsp;</strong>${data.dateFormatted}<br>
-                <strong>Pembayaran:&nbsp;</strong>${data.payment}
+                <strong>Pembayaran:&nbsp;</strong>${data.payment || '-'}
               </div>
             </div>
             <div class="meta-box">
               <div class="meta-lbl">Detail Pembeli</div>
               <div class="meta-val">
-                <strong>Nama:&nbsp;</strong>${data.buyerName}<br>
-                <strong>No. HP:&nbsp;</strong>${data.buyerPhone}<br>
-                <strong>Alamat:&nbsp;</strong>${data.buyerAddress || '-'}
+                <strong>Nama:&nbsp;</strong>${data.custName}<br>
+                <strong>No. HP:&nbsp;</strong>${data.custPhone}<br>
+                <strong>Alamat:&nbsp;</strong>${data.custAddress || '-'}
               </div>
             </div>
           </div>
@@ -356,28 +359,28 @@
               </div>
               <div class="sb-row sb-total">
                 <span>TOTAL</span>
-                <span>${formatRp(data.total)}</span>
+                <span>${formatRp(data.grandTotal)}</span>
               </div>
             </div>
           </div>
 
           <div class="note-sect">
             ${warrantyHtml}
-            <div class="note-text">${store.notes.replace(/\n/g, '<br>')}</div>
+            <div class="note-text">${noteText || 'Terima kasih atas kepercayaan Anda.'}</div>
           </div>
 
           <div class="ttd-row">
             <div class="ttd-box">
               <div class="ttd-role">Tanda Tangan Pelanggan</div>
               <div class="ttd-sp">
-                ${data.signatures && data.signatures.buyer ? `<img src="${data.signatures.buyer}">` : ''}
+                ${data.custSignature ? `<img src="${data.custSignature}">` : ''}
               </div>
-              <div class="ttd-ln">( ${data.buyerName || 'Pelanggan'} )</div>
+              <div class="ttd-ln">( ${data.custName || 'Pelanggan'} )</div>
             </div>
             <div class="ttd-box">
               <div class="ttd-role">Penjual</div>
               <div class="ttd-sp">
-                ${data.signatures && data.signatures.seller ? `<img src="${data.signatures.seller}">` : ''}
+                ${data.sellerSignature ? `<img src="${data.sellerSignature}">` : ''}
               </div>
               <div class="ttd-ln">( Hormat Kami )</div>
             </div>

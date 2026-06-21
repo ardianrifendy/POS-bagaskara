@@ -1059,7 +1059,6 @@
     }
     .preview-box * {
       letter-spacing: 0 !important; /* Hindari bug tumpang tindih huruf di html2canvas */
-      word-spacing: 0 !important;
       font-family: Arial, Helvetica, sans-serif !important;
       text-rendering: geometricPrecision !important;
     }
@@ -2758,12 +2757,8 @@
 
     <!-- FLOATING ACTIONS IN PREVIEW -->
     <div class="action-row">
-      <button class="btn-wa" id="btn-share-pdf" onclick="shareToWhatsAppFromPreview()" style="background:var(--or);">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 6 2 18 2 18 9"></polyline><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path><rect x="6" y="14" width="12" height="8"></rect></svg>
-        Simpan / Bagikan PDF
-      </button>
-      <button class="btn-print" onclick="openChromePrint()">
-        🖨️ Cetak Invoice (Chrome)
+      <button class="btn-print" onclick="printInvoiceNative()" style="width: 100%; font-weight: bold; font-size: 14px; padding: 14px; background: var(--or); border: none; border-radius: 12px; color: #fff; cursor: pointer;">
+        🖨️ Cetak Invoice
       </button>
     </div>
   </div>
@@ -4997,12 +4992,6 @@
       currentPreviewData = null;
     }
 
-    // WHATSAPP SEND IN PREVIEW
-    function shareToWhatsAppFromPreview() {
-      if (currentPreviewData) {
-        shareInvoicePDF(currentPreviewData);
-      }
-    }
 
     function shareToWhatsApp(invNo) {
       const inv = database.find(x => x.invNo === invNo);
@@ -5015,257 +5004,12 @@
     }
 
     // FUNGSI UNTUK CETAK INVOICE (DIPANGGIL DARI PREVIEW)
-    // BUKA CHROME UNTUK CETAK INVOICE
-    function openChromePrint() {
-      const data = currentPreviewData;
-      if (!data) return;
-      
-      const store = JSON.parse(localStorage.getItem('bagaskara_store_info')) || defaultStoreSettings;
-      
-      // Encode data as Base64 to pass safely in URL
-      // Use btoa(unescape(encodeURIComponent())) to handle unicode safely
-      const encodedData = btoa(unescape(encodeURIComponent(JSON.stringify(data))));
-      const encodedStore = btoa(unescape(encodeURIComponent(JSON.stringify(store))));
-      
-      // Ganti URL ini jika nama repo/domain berubah
-      const baseUrl = 'https://ardianrifendy.github.io/POS-bagaskara/print.html';
-      const printUrl = `${baseUrl}?d=${encodedData}&s=${encodedStore}`;
-      
-      showToast("Membuka browser (Chrome) untuk cetak...", false);
-      
+    // FUNGSI UNTUK CETAK INVOICE NATIVE
+    function printInvoiceNative() {
+      showToast("Menyiapkan dokumen untuk dicetak...", false);
       setTimeout(() => {
-        if (typeof CapBrowser !== 'undefined') {
-          // Buka di browser eksternal bawaan sistem (Chrome)
-          window.open(printUrl, '_system');
-        } else {
-          // Fallback browser PC
-          window.open(printUrl, '_blank');
-        }
+        window.print();
       }, 500);
-    }
-
-    // FUNGSI UNTUK MENYIMPAN PDF DAN SHARE (DARI PREVIEW)
-    function shareInvoicePDF(data) {
-      if (!data) return;
-      
-      const btn = document.getElementById('btn-share-pdf');
-      const originalText = btn.innerHTML;
-      btn.disabled = true;
-      btn.innerHTML = `<span>⏳ Membuat PDF...</span>`;
-
-      const store = JSON.parse(localStorage.getItem('bagaskara_store_info')) || defaultStoreSettings;
-      const pdfFolder = store.pdfFolder || 'BagaskaraCell_Invoice';
-      const fileName = `Invoice_${data.invNo.replace(/\//g, '_')}.pdf`;
-
-      const original = document.getElementById('print-area');
-
-      // Gunakan wrapper div dengan opacity: 0 dan position absolute
-      const wrapper = document.createElement('div');
-      wrapper.style.cssText = `
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 1000px;
-        opacity: 0.01;
-        pointer-events: none;
-        background: #ffffff;
-      `;
-      
-      const clone = original.cloneNode(true);
-      // PENTING: Gunakan layout LEBAR (1000px) agar sama persis seperti versi Desktop/Web
-      clone.style.width = `1000px`;
-      clone.style.maxWidth = `1000px`;
-      clone.style.background = '#ffffff';
-      clone.style.margin = '0';
-      clone.style.padding = '40px'; // Beri ruang lega seperti kertas sungguhan
-      
-      wrapper.appendChild(clone);
-      document.body.appendChild(wrapper);
-
-      // Tunggu semua gambar (logo, tanda tangan) selesai dimuat
-      const images = clone.querySelectorAll('img');
-      const imagePromises = Array.from(images).map(img => {
-        if (img.complete) return Promise.resolve();
-        return new Promise(resolve => {
-          img.onload = resolve;
-          img.onerror = resolve;
-        });
-      });
-
-      Promise.all(imagePromises).then(() => {
-        // PENGATURAN KUNCI UNTUK MENDAPATKAN HASIL CETAK LANDSCAPE LETTER
-        // Sama persis dengan screenshot PC: Kertas Letter, Orientasi Landscape.
-        const opt = {
-          margin:       0.2,
-          filename:     fileName,
-          image:        { type: 'jpeg', quality: 1.0 },
-          html2canvas:  {
-            scale: 2,
-            useCORS: true,
-            allowTaint: true,
-            logging: false,
-            scrollX: 0,
-            scrollY: 0,
-            backgroundColor: '#ffffff',
-            windowWidth: 1000
-          },
-          jsPDF:        { unit: 'in', format: 'letter', orientation: 'landscape' }
-        };
-
-        html2pdf().set(opt).from(clone).outputPdf('blob').then(async function(pdfBlob) {
-          document.body.removeChild(wrapper);
-          btn.disabled = false;
-          btn.innerHTML = originalText;
-
-          // === NATIVE APP PATH (Capacitor) ===
-          if (typeof CapFilesystem !== 'undefined' && typeof CapShare !== 'undefined') {
-            try {
-              const base64Data = await blobToBase64(pdfBlob);
-              
-              if (CapFilesystem.requestPermissions) {
-                try { await CapFilesystem.requestPermissions(); } catch(e) {}
-              }
-
-              let shareUri = '';
-              try {
-                const cacheResult = await CapFilesystem.writeFile({
-                  path: fileName,
-                  data: base64Data,
-                  directory: 'CACHE'
-                });
-                shareUri = cacheResult.uri;
-              } catch (e) {
-                console.error('Failed writing to CACHE:', e);
-              }
-              
-              try {
-                await CapFilesystem.writeFile({
-                  path: `${pdfFolder}/${fileName}`,
-                  data: base64Data,
-                  directory: 'DOCUMENTS',
-                  recursive: true
-                });
-                showToast(`📄 PDF disimpan di Documents/${pdfFolder}/`);
-              } catch(e) {
-                console.warn('Could not write to DOCUMENTS:', e);
-              }
-
-              if (shareUri) {
-                await CapShare.share({
-                  title: `Invoice ${data.invNo}`,
-                  text: `Halo, berikut invoice belanja Anda dari ${store.name}.`,
-                  url: shareUri,
-                  dialogTitle: 'Bagikan / Cetak Invoice'
-                });
-              } else {
-                throw new Error("No share URI available");
-              }
-            } catch (err) {
-              console.error('File Error:', err);
-              showToast('❌ Gagal membagikan PDF (Akses Ditolak)');
-              fallbackWebShare(pdfBlob, fileName, data, store);
-            }
-          } 
-          // === BROWSER / WEB PATH ===
-          else {
-            fallbackWebShare(pdfBlob, fileName, data, store);
-          }
-        });
-      });
-    }
-
-    function blobToBase64(blob) {
-      return new Promise((resolve, reject) => {
-        const reader = new FileReader();
-        reader.onloadend = () => {
-          const base64 = reader.result.split(',')[1];
-          resolve(base64);
-        };
-        reader.onerror = reject;
-        reader.readAsDataURL(blob);
-      });
-    }
-
-    function fallbackWebShare(pdfBlob, fileName, data, store) {
-      const file = new File([pdfBlob], fileName, { type: 'application/pdf' });
-      
-      if (navigator.canShare && navigator.canShare({ files: [file] })) {
-        navigator.share({
-          files: [file],
-          title: `Invoice ${data.invNo}`,
-          text: `Halo, berikut invoice belanja Anda dari ${store.name}.`
-        }).then(() => {
-          showToast("Invoice berhasil dibagikan!");
-        }).catch((err) => {
-          console.log("Share cancelled:", err);
-        });
-      } else {
-        const url = URL.createObjectURL(pdfBlob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = fileName;
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-        URL.revokeObjectURL(url);
-        showToast("PDF diunduh! Kirim file secara manual.", false);
-      }
-    }
-
-    function executeWhatsAppShare(data) {
-      const store = JSON.parse(localStorage.getItem('bagaskara_store_info')) || defaultStoreSettings;
-      
-      let msg = `*INVOICE ${store.name.toUpperCase()}*\n`;
-      msg += `-------------------------------------------\n`;
-      msg += `*No Invoice:* ${data.invNo}\n`;
-      msg += `*Tanggal:* ${data.dateFormatted}\n`;
-      msg += `*Metode Pembayaran:* ${data.payment}\n\n`;
-      
-      msg += `*Pelanggan:*\n`;
-      msg += `• Nama: ${data.custName}\n`;
-      msg += `• HP: ${data.custPhone}\n`;
-      msg += `• Alamat: ${data.custAddress}\n\n`;
-
-      msg += `*Daftar Belanja:*\n`;
-      data.items.forEach((item, index) => {
-        msg += `${index + 1}. *${item.name}* (x${item.qty})\n`;
-        if (item.imei) msg += `   _IMEI/SN: ${item.imei}_\n`;
-        msg += `   Harga: Rp ${item.price.toLocaleString('id-ID')}\n`;
-      });
-      msg += `\n`;
-
-      if (data.discount > 0) {
-        msg += `*Subtotal:* Rp ${data.subtotal.toLocaleString('id-ID')}\n`;
-        msg += `*Diskon:* Rp ${data.discount.toLocaleString('id-ID')}\n`;
-      }
-      msg += `*Total Pembayaran:* Rp ${data.grandTotal.toLocaleString('id-ID')}\n\n`;
-
-      // Warranty info
-      if (data.warrantyType === 'none') {
-        msg += `*Garansi:* Tanpa Garansi\n`;
-      } else if (data.warrantyType === 'personal') {
-        msg += `*Garansi:* Garansi Personal Toko (${data.warrantyDur})\n`;
-      } else if (data.warrantyType === 'resmi') {
-        msg += `*Garansi:* Garansi Resmi Brand (${data.warrantyDur})\n`;
-      }
-      
-      if (data.notes) {
-        msg += `\n*Catatan:* _${data.notes}_\n`;
-      }
-      msg += `-------------------------------------------\n`;
-      msg += `*${store.name}*\n`;
-      msg += `${store.address}\n`;
-      msg += `WA: ${store.phones}`;
-
-      // Format WhatsApp number
-      let cleanPhone = data.custPhone.replace(/\D/g, '');
-      if (cleanPhone.startsWith('0')) {
-        cleanPhone = '62' + cleanPhone.substring(1);
-      }
-      
-      const encodedMsg = encodeURIComponent(msg);
-      const waUrl = `https://api.whatsapp.com/send?phone=${cleanPhone}&text=${encodedMsg}`;
-      window.open(waUrl, '_blank');
     }
 
     // SETTINGS PANEL ACTIONS

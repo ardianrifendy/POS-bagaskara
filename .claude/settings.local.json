@@ -3,7 +3,14 @@
     "allow": [
       "PowerShell(\\(Get-Content \"D:\\\\AntiGravity\\\\BagaskaraCell\\\\www\\\\index.html\" | Measure-Object -Line\\).Lines)",
       "PowerShell(Get-Process *)",
-      "PowerShell(\\(Get-Content \"D:\\\\AntiGravity\\\\BagaskaraCell\\\\www\\\\index.html\"\\).Count)"
+      "PowerShell(\\(Get-Content \"D:\\\\AntiGravity\\\\BagaskaraCell\\\\www\\\\index.html\"\\).Count)",
+      "PowerShell(cmd /c \"cd D:\\\\AntiGravity\\\\BagaskaraCell && npm run sync\" 2>&1)",
+      "PowerShell(cmd /c \"cd D:\\\\AntiGravity\\\\BagaskaraCell\\\\android && gradlew.bat assembleDebug\" 2>&1)",
+      "PowerShell(cmd /c \"D:\\\\AntiGravity\\\\BagaskaraCell\\\\android\\\\gradlew.bat assembleDebug\" 2>&1)",
+      "Bash(./gradlew assembleDebug)",
+      "Bash(cmd /c \"npm run sync\")",
+      "Bash(npx cap *)",
+      "PowerShell(Copy-Item *)"
     ]
   }
 }
