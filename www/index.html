@@ -4647,6 +4647,29 @@
            });
         });
         
+        if (previewImg) {
+            previewImg.addEventListener('click', (e) => {
+                e.stopPropagation();
+                let zoomModal = document.getElementById('catalog-zoom-modal');
+                let zoomImg = document.getElementById('catalog-zoom-img');
+                if (!zoomModal) {
+                    zoomModal = document.createElement('div');
+                    zoomModal.id = 'catalog-zoom-modal';
+                    zoomModal.style = 'display:flex; position:fixed; top:0; left:0; right:0; bottom:0; background:rgba(0,0,0,0.9); z-index:9999; align-items:center; justify-content:center; padding:20px; flex-direction:column;';
+                    zoomModal.onclick = function() { this.style.display = 'none'; };
+                    zoomModal.innerHTML = `
+                      <div style="position:absolute; top:20px; right:20px; width:40px; height:40px; background:var(--bk2); border-radius:50%; display:flex; align-items:center; justify-content:center; color:#fff; font-weight:bold; font-size:20px; cursor:pointer; border:1px solid rgba(255,255,255,0.1);">&times;</div>
+                      <img id="catalog-zoom-img" src="" style="max-width:100%; max-height:80vh; object-fit:contain; border-radius:12px;">
+                      <div style="margin-top:20px; color:var(--gy); font-size:12px;">Ketuk dimana saja untuk menutup</div>
+                    `;
+                    document.body.appendChild(zoomModal);
+                    zoomImg = document.getElementById('catalog-zoom-img');
+                }
+                zoomImg.src = previewImg.src;
+                zoomModal.style.display = 'flex';
+            });
+        }
+        
         header.addEventListener('click', () => {
             if (container.style.display === 'none') {
                 container.style.display = 'block';
