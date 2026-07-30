@@ -10,7 +10,14 @@
       "Bash(./gradlew assembleDebug)",
       "Bash(cmd /c \"npm run sync\")",
       "Bash(npx cap *)",
-      "PowerShell(Copy-Item *)"
+      "PowerShell(Copy-Item *)",
+      "Skill(run)",
+      "Bash(npx --yes playwright --version)",
+      "PowerShell(cmd /c \"cd D:\\\\AntiGravity\\\\BagaskaraCell && npm install playwright 2>&1\")",
+      "Bash(npm install *)",
+      "Bash(npx playwright *)",
+      "Bash(node screenshot_tabs.js)",
+      "PowerShell(Start-Process explorer.exe \"D:\\\\AntiGravity\\\\BagaskaraCell\\\\screenshots\")"
     ]
   }
 }

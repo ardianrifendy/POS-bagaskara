@@ -1,0 +1,321 @@
+{
+  "_version": 3,
+  "_exported_at": "2026-07-30",
+  "store_info": {
+    "name": "Bagaskara Cell",
+    "address": "Jl. Edelweis N.6 Perum Bhummi Cermai Apsari, Cerme, Gresik",
+    "phone": "0895-1367-9939",
+    "phoneSecondary": "0819-5977-7770",
+    "instagram": "@bagaskara_cell",
+    "pdfFolder": "BagaskaraCell_Invoice"
+  },
+  "templates": {
+    "umum": "Terima kasih telah berbelanja di Bagaskara Cell. Barang yang sudah dibeli tidak dapat dikembalikan kecuali ada perjanjian garansi.",
+    "hp": "Garansi unit HP meliputi garansi mesin dan fungsi bawaan.",
+    "aksesoris": "Garansi aksesoris berlaku jika segel toko masih utuh.",
+    "servis": "Garansi servis berlaku untuk pengerjaan/sparepart yang diganti."
+  },
+  "invoices": [
+    {
+      "id": "INV/20260617/147",
+      "date": "2026-06-21",
+      "customerName": "Pelanggan",
+      "customerPhone": "-",
+      "customerAddress": "-",
+      "paymentMethod": "Cash",
+      "status": "Lunas",
+      "items": [
+        {
+          "name": "1",
+          "imei": "",
+          "qty": 1,
+          "price": 66000000,
+          "discount": 0,
+          "subtotal": 66000000
+        }
+      ],
+      "subtotal": 66000000,
+      "discount": 0,
+      "grandTotal": 66000000,
+      "amountPaid": 66000000,
+      "amountRemaining": 0,
+      "warrantyType": "personal",
+      "warrantyDuration": "7 Hari",
+      "notes": "Di-restore otomatis dari nota PDF"
+    },
+    {
+      "id": "INV/20260620/002",
+      "date": "2026-06-20",
+      "customerName": "Ralinee",
+      "customerPhone": "+6285939413003",
+      "customerAddress": "-",
+      "paymentMethod": "Transfer Bank",
+      "status": "Lunas",
+      "items": [
+        {
+          "name": "Xiaomi Redmi Pad 2 (4/128 - Lavender Purple)",
+          "imei": "",
+          "qty": 1,
+          "price": 2400000,
+          "discount": 0,
+          "subtotal": 2400000
+        }
+      ],
+      "subtotal": 2400000,
+      "discount": 0,
+      "grandTotal": 2400000,
+      "amountPaid": 2400000,
+      "amountRemaining": 0,
+      "warrantyType": "personal",
+      "warrantyDuration": "7 Hari",
+      "notes": "Di-restore otomatis dari nota PDF"
+    },
+    {
+      "id": "INV/20260621/001",
+      "date": "2026-06-21",
+      "customerName": "Istriku Tercinta",
+      "customerPhone": "+6285156703424",
+      "customerAddress": "-",
+      "paymentMethod": "Cash",
+      "status": "Lunas",
+      "items": [
+        {
+          "name": "Transaksi HP / Aksesoris (INV/20260621/001)",
+          "imei": "",
+          "qty": 1,
+          "price": 500000,
+          "discount": 0,
+          "subtotal": 500000
+        }
+      ],
+      "subtotal": 500000,
+      "discount": 0,
+      "grandTotal": 500000,
+      "amountPaid": 500000,
+      "amountRemaining": 0,
+      "warrantyType": "personal",
+      "warrantyDuration": "7 Hari",
+      "notes": "Di-restore otomatis dari nota PDF"
+    },
+    {
+      "id": "INV/20260621/003",
+      "date": "2026-06-20",
+      "customerName": "Ralinee",
+      "customerPhone": "+6285939413003",
+      "customerAddress": "-",
+      "paymentMethod": "Transfer Bank",
+      "status": "Lunas",
+      "items": [
+        {
+          "name": "Transaksi HP / Aksesoris (INV/20260621/003)",
+          "imei": "",
+          "qty": 1,
+          "price": 500000,
+          "discount": 0,
+          "subtotal": 500000
+        }
+      ],
+      "subtotal": 500000,
+      "discount": 0,
+      "grandTotal": 500000,
+      "amountPaid": 500000,
+      "amountRemaining": 0,
+      "warrantyType": "personal",
+      "warrantyDuration": "7 Hari",
+      "notes": "Di-restore otomatis dari nota PDF"
+    },
+    {
+      "id": "INV/20260621/004",
+      "date": "2026-06-19",
+      "customerName": "Riki Caca Store",
+      "customerPhone": "+628385845748",
+      "customerAddress": "-",
+      "paymentMethod": "Transfer Bank",
+      "status": "Lunas",
+      "items": [
+        {
+          "name": "Samsung Samsung Galaxy S26 (12/512 - Light Blue)",
+          "imei": "352954990104590",
+          "qty": 1,
+          "price": 12725000,
+          "discount": 0,
+          "subtotal": 12725000
+        }
+      ],
+      "subtotal": 12725000,
+      "discount": 0,
+      "grandTotal": 12725000,
+      "amountPaid": 12725000,
+      "amountRemaining": 0,
+      "warrantyType": "resmi",
+      "warrantyDuration": "1 Tahun",
+      "notes": "Di-restore otomatis dari nota PDF"
+    },
+    {
+      "id": "INV/20260622/001",
+      "date": "2026-06-22",
+      "customerName": "Dijah",
+      "customerPhone": "+6281233552349",
+      "customerAddress": "-",
+      "paymentMethod": "Cash",
+      "status": "Lunas",
+      "items": [
+        {
+          "name": "Xiaomi Redmi 15C (6/128 - Black)",
+          "imei": "861050083194608",
+          "qty": 1,
+          "price": 2349000,
+          "discount": 0,
+          "subtotal": 2349000
+        }
+      ],
+      "subtotal": 2349000,
+      "discount": 0,
+      "grandTotal": 2349000,
+      "amountPaid": 2349000,
+      "amountRemaining": 0,
+      "warrantyType": "resmi",
+      "warrantyDuration": "1 Tahun",
+      "notes": "Di-restore otomatis dari nota PDF"
+    },
+    {
+      "id": "INV/20260622/002",
+      "date": "2026-06-22",
+      "customerName": "Neyla ZH",
+      "customerPhone": "0813-8999-0846",
+      "customerAddress": "Wedani, Cerme, Gresik",
+      "paymentMethod": "Transfer Bank",
+      "status": "Lunas",
+      "items": [
+        {
+          "name": "1",
+          "imei": "356004164693089",
+          "qty": 1,
+          "price": 15499000,
+          "discount": 0,
+          "subtotal": 15499000
+        }
+      ],
+      "subtotal": 15499000,
+      "discount": 0,
+      "grandTotal": 15499000,
+      "amountPaid": 15499000,
+      "amountRemaining": 0,
+      "warrantyType": "resmi",
+      "warrantyDuration": "1 Tahun",
+      "notes": "Di-restore otomatis dari nota PDF"
+    },
+    {
+      "id": "INV/20260623/002",
+      "date": "2026-06-23",
+      "customerName": "Haryo Yudanto",
+      "customerPhone": "-",
+      "customerAddress": "Tytyan Indah Blok L2 No4, BEKASI BARAT, KOTA BEKASI, JAWA BARAT",
+      "paymentMethod": "Cash",
+      "status": "Lunas",
+      "items": [
+        {
+          "name": "POCO POCO F8 Ultra (16/512 - Denim Blue)",
+          "imei": "863784085647704",
+          "qty": 1,
+          "price": 13000000,
+          "discount": 0,
+          "subtotal": 13000000
+        }
+      ],
+      "subtotal": 13000000,
+      "discount": 0,
+      "grandTotal": 13000000,
+      "amountPaid": 13000000,
+      "amountRemaining": 0,
+      "warrantyType": "resmi",
+      "warrantyDuration": "1 Tahun",
+      "notes": "Di-restore otomatis dari nota PDF"
+    },
+    {
+      "id": "INV/20260703/001",
+      "date": "2026-07-03",
+      "customerName": "Renita",
+      "customerPhone": "0852-3333-3093",
+      "customerAddress": "-",
+      "paymentMethod": "Transfer Bank",
+      "status": "Lunas",
+      "items": [
+        {
+          "name": "POCO POCO X8 Pro (12/512 - Black)",
+          "imei": "",
+          "qty": 1,
+          "price": 6050000,
+          "discount": 0,
+          "subtotal": 6050000
+        }
+      ],
+      "subtotal": 6050000,
+      "discount": 0,
+      "grandTotal": 6050000,
+      "amountPaid": 6050000,
+      "amountRemaining": 0,
+      "warrantyType": "personal",
+      "warrantyDuration": "7 Hari",
+      "notes": "Di-restore otomatis dari nota PDF"
+    },
+    {
+      "id": "INV/20260704/001",
+      "date": "2026-07-04",
+      "customerName": "Ibnu",
+      "customerPhone": "+6281371818151",
+      "customerAddress": "-",
+      "paymentMethod": "Cash",
+      "status": "Lunas",
+      "items": [
+        {
+          "name": "POCO POCO X8 Pro (12/512 - Black)",
+          "imei": "",
+          "qty": 1,
+          "price": 6100000,
+          "discount": 0,
+          "subtotal": 6100000
+        }
+      ],
+      "subtotal": 6100000,
+      "discount": 0,
+      "grandTotal": 6100000,
+      "amountPaid": 6100000,
+      "amountRemaining": 0,
+      "warrantyType": "personal",
+      "warrantyDuration": "7 Hari",
+      "notes": "Di-restore otomatis dari nota PDF"
+    },
+    {
+      "id": "INV/20260722/001",
+      "date": "2026-07-22",
+      "customerName": "Bayu",
+      "customerPhone": "0823-3133-3381",
+      "customerAddress": "-",
+      "paymentMethod": "Transfer Bank",
+      "status": "Lunas",
+      "items": [
+        {
+          "name": "Infinix Infinix Note Edge 5G (8/256 - Lunar Titanium)",
+          "imei": "",
+          "qty": 1,
+          "price": 4199000,
+          "discount": 0,
+          "subtotal": 4199000
+        }
+      ],
+      "subtotal": 4199000,
+      "discount": 0,
+      "grandTotal": 4199000,
+      "amountPaid": 4199000,
+      "amountRemaining": 0,
+      "warrantyType": "personal",
+      "warrantyDuration": "7 Hari",
+      "notes": "Di-restore otomatis dari nota PDF"
+    }
+  ],
+  "products": [],
+  "expenses": [],
+  "counter": 11,
+  "last_date": "2026-07-30"
+}
